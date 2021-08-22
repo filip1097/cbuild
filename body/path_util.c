@@ -40,3 +40,10 @@ void join_paths(char* dest, char* left_path, char* right_path)
   strcat(dest, "\\");
   strcat(dest, right_path);
 }
+
+Path_Part_Struct get_dir_path()
+{
+  char* lastBackSlash_p = strrchr(path_p, '\\');
+  Path_Part_Struct dirPath = {.path_p = path_p, .length = lastBackSlash_p - path_p};
+  return dirPath; 
+}

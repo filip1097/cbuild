@@ -6,6 +6,9 @@
 
 /*> Includes *********************************************************************************************************/
 
+#include <stdio.h>
+#include <string.h>
+
 /*> Defines **********************************************************************************************************/
 
 /*> Type Declarations ************************************************************************************************/
@@ -26,5 +29,13 @@
 
 void do_gcc_calls()
 {
-
+  printf("Do the gcc calls now\n");
+  for (File_List_Node_Struct* node_p = c_files.first; node_p != NULL; node_p = node_p->next)
+  {
+    char includeDirs[];
+    // TODO: ensure no buffer overflow
+    char command[] = "gcc -c %s -I ";
+    system()
+  }
 }
+
