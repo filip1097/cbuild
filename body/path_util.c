@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "file_list.h"
+#include "path_util.h"
 
 /*> Defines **********************************************************************************************************/
 
@@ -41,9 +42,9 @@ void join_paths(char* dest, char* left_path, char* right_path)
   strcat(dest, right_path);
 }
 
-Path_Part_Struct get_dir_path()
+Path_Part_Struct get_dir_part(char* path_p)
 {
   char* lastBackSlash_p = strrchr(path_p, '\\');
-  Path_Part_Struct dirPath = {.path_p = path_p, .length = lastBackSlash_p - path_p};
+  Path_Part_Struct dirPath = {.path_p = path_p, .length = lastBackSlash_p - path_p + 1};
   return dirPath; 
 }

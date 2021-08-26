@@ -26,7 +26,7 @@ typedef struct File_List_Node_Struct
   char* fileName_p;
   uint64_t checksum;
   struct File_List_Node_Struct* dependencies[MAX_DEPENDENCIES];
-  int n_dependencies;
+  int numDependencies;
   struct File_List_Node_Struct* next;
   bool needsRecompilation;
 } File_List_Node_Struct;
@@ -45,13 +45,13 @@ typedef struct File_List_Struct
 
 void add_to_file_list(File_List_Struct* list, char* path_p);
 
-File_List_Node_Struct* find_file_node(File_List_Struct* list_p, char* fileNameStart_p, int fileNameLength); 
+File_List_Node_Struct* find_file_node(File_List_Struct* list_p, char* const fileNameStart_p, int fileNameLength); 
 
 void static inline add_dependency_to_file_node(File_List_Node_Struct* node, File_List_Node_Struct* dependency)
 {
-  assert(node->n_dependencies < MAX_DEPENDENCIES);
-  node->dependencies[node->n_dependencies] = dependency;
-  node->n_dependencies++;
+  assert(node->numDependencies < MAX_DEPENDENCIES);
+  node->dependencies[node->numDependencies] = dependency;
+  node->numDependencies++;
 }
 
 void add_dependencies_to_file_node(File_List_Node_Struct* dest_node, File_List_Node_Struct* src_node);

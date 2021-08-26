@@ -5,6 +5,7 @@
 */
 
 /*> Includes *********************************************************************************************************/
+#include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,14 +33,20 @@
 void add_to_file_list(File_List_Struct* list, char* path_p)
 {
   File_List_Node_Struct* new_node = malloc(sizeof(*new_node));
-  new_node->n_dependencies = 0;
+  new_node->numDependencies = 0;
   new_node->next = NULL;
   new_node->needsRecompilation = true;
   
-  /* TODO: ensure buffer is not overflowed */
+  assert(strlen(path_p) < MAX_PATH_LENGTH);
   strcpy(new_node->path, path_p);
-  char* lastBackSlash = strrchr(path_p, '\\');
-  new_node->fileName_p = (lastBackSlash + 1);
+  char* lastBackSlash_p = strrchr(new_node->path, '\\');
+  if (lastBackSlash_p == NULL)
+  {
+    new_node->fileName_p = new_node->path;
+  }
+  else{
+    new_node->fileName_p = (lastBackSlash_p + 1);
+  }
 
   if (list->first == NULL) 
   {
@@ -53,7 +60,7 @@ void add_to_file_list(File_List_Struct* list, char* path_p)
   }
 }
 
-File_List_Node_Struct* find_file_node(File_List_Struct* list_p, char* fileName_p, int fileNameLength)
+File_List_Node_Struct* find_file_node(File_List_Struct* list_p, char* const fileName_p, int fileNameLength)
 {
   for (File_List_Node_Struct* node_p = list_p->first; node_p != NULL; node_p = node_p->next)
   {
@@ -67,12 +74,12 @@ File_List_Node_Struct* find_file_node(File_List_Struct* list_p, char* fileName_p
 
 void add_dependencies_to_file_node(File_List_Node_Struct* dest_node, File_List_Node_Struct* src_node)
 {
-  for (int i = 0; i < src_node->n_dependencies; i++)
+  for (int i = 0; i < src_node->numDependencies; i++)
   {
     assert(dest_node != src_node->dependencies[i]);
 
     bool already_added = false;
-    for (int j = 0; j < dest_node->n_dependencies; j++)
+    for (int j = 0; j < dest_node->numDependencies; j++)
     {
       if (dest_node->dependencies[j] == src_node->dependencies[i])
       {

@@ -41,31 +41,44 @@ int main()
   checksum_files();
   calc_dependencies();
 
-  bool found_stored_cache = load_stored_cache(CACHE_PATH);
-  if (found_stored_cache)
+  bool foundStoredCache = load_stored_cache(CACHE_PATH);
+  if (foundStoredCache)
   {
     determine_files_to_be_recompiled();
   }
-
-  do_gcc_calls();
 
   for (File_List_Node_Struct* node = c_files.first; node != NULL; node = node->next)
   {
     printf("C node: name=%s, cache=%" PRIu64 ", needsCompilation=%d\n", 
               node->path, node->checksum, node->needsRecompilation);
+    for (int i = 0; i < node->numDependencies; i++)
+    {
+      printf("--Dependency = %s\n", node->dependencies[i]);
+    }
   }
 
   for (File_List_Node_Struct* node = h_files.first; node != NULL; node = node->next)
   {
     printf("H node: name=%s, cache=%" PRIu64 ", needsCompilation=%d\n", 
               node->path, node->checksum, node->needsRecompilation);
+    for (int i = 0; i < node->numDependencies; i++)
+    {
+      printf("--Dependency = %s\n", node->dependencies[i]);
+    }
   }
 
   for (File_List_Node_Struct* node = cached_files.first; node != NULL; node = node->next)
   {
     printf("Cached node: name=%s, cache=%" PRIu64 ", needsCompilation=%d\n", 
               node->path, node->checksum, node->needsRecompilation);
+    for (int i = 0; i < node->numDependencies; i++)
+    {
+      printf("--Dependency = %s\n", node->dependencies[i]);
+    }
   }
+
+  do_gcc_calls();
+
 
   // compile files and link
 

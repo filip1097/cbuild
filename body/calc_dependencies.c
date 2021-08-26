@@ -29,17 +29,17 @@ static void calc_dependencies_for_list(File_List_Struct* fileList_p)
   File_List_Node_Struct* current_node = fileList_p->first;
   while (current_node != NULL)
   {
-    int old_n_dependencies;
+    int oldNumDependencies;
     int start_index = 0;
     do 
     {
-      old_n_dependencies = current_node->n_dependencies;
-      for (int i = start_index; i < old_n_dependencies; i++)
+      oldNumDependencies = current_node->numDependencies;
+      for (int i = start_index; i < oldNumDependencies; i++)
       {
         add_dependencies_to_file_node(current_node, current_node->dependencies[i]);
       }
-      start_index = old_n_dependencies;
-    } while (current_node->n_dependencies > old_n_dependencies);
+      start_index = oldNumDependencies;
+    } while (current_node->numDependencies > oldNumDependencies);
     current_node = current_node->next;
   }
 }

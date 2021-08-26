@@ -20,7 +20,7 @@ typedef struct Path_Part_Struct
 {
   char* path_p;
   int length;
-} Path_Path_Struct;
+} Path_Part_Struct;
 
 /*> Constant Declarations ********************************************************************************************/
 
@@ -28,14 +28,20 @@ typedef struct Path_Part_Struct
 
 /*> Function Declarations ********************************************************************************************/
 
-void join_paths(char* dest, char* left_path, char* right_path);
-
-Path_Part_Struct get_dir_part(char* path_p);
-
 static inline bool file_exists(char* path_p)
 {
   struct stat status;
   return stat(path_p, &status) == 0;
+}
+
+Path_Part_Struct get_dir_part(char* path_p);
+
+void join_paths(char* dest, char* left_path, char* right_path);
+
+static inline bool path_part_equal(Path_Part_Struct* pathPart1_p, Path_Part_Struct* pathPart2_p)
+{
+  return (pathPart1_p->length == pathPart2_p->length) && 
+         (strncmp(pathPart1_p->path_p, pathPart2_p->path_p, pathPart1_p->length) == 0);
 }
 
 /*> End of Multiple Inclusion Protection *****************************************************************************/

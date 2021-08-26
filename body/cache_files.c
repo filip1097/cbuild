@@ -388,8 +388,9 @@ void determine_files_to_be_recompiled()
   for (File_List_Node_Struct* node_p = c_files.first; node_p != NULL; node_p = node_p->next)
   {
     char* nodeName_p = node_p->fileName_p;
+    int nameLength = strlen(nodeName_p);
 
-    File_List_Node_Struct* cachedNode_p = find_file_node(&cached_files, nodeName_p, strlen(nodeName_p));
+    File_List_Node_Struct* cachedNode_p = find_file_node(&cached_files, nodeName_p, nameLength);
     if (cachedNode_p != NULL)
     {
       node_p->needsRecompilation = !(node_p->checksum == cachedNode_p->checksum);

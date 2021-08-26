@@ -1,41 +1,105 @@
-/*> Description ******************************************************************************************************/
+/*> Description *********************************************************************************************/
 /**
 * @brief Defines functions to call gcc.
 * @file gcc_calls.c
 */
 
-/*> Includes *********************************************************************************************************/
+/*> Includes ************************************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-/*> Defines **********************************************************************************************************/
+#include "file_list.h"
+#include "globals.h"
+#include "path_util.h"
 
-/*> Type Declarations ************************************************************************************************/
+/*> Defines *************************************************************************************************/
 
-/*> Global Constant Definitions **************************************************************************************/
+#define MAX_INCLUDE_PATHS 100
+#define MAX_COMMAND_LENGTH 1000
 
-/*> Global Variable Definitions **************************************************************************************/
+/*> Type Declarations ***************************************************************************************/
 
-/*> Local Constant Definitions ***************************************************************************************/
+/*> Global Constant Definitions *****************************************************************************/
 
-/*> Local Variable Definitions ***************************************************************************************/
+/*> Global Variable Definitions *****************************************************************************/
 
-/*> Local Function Declarations **************************************************************************************/
+/*> Local Constant Definitions ******************************************************************************/
 
-/*> Local Function Definitions ***************************************************************************************/
+/*> Local Variable Definitions ******************************************************************************/
 
-/*> Global Function Definitions **************************************************************************************/
+/*> Local Function Declarations *****************************************************************************/
+
+/*> Local Function Definitions ******************************************************************************/
+
+/*> Global Function Definitions *****************************************************************************/
 
 void do_gcc_calls()
 {
-  printf("Do the gcc calls now\n");
   for (File_List_Node_Struct* node_p = c_files.first; node_p != NULL; node_p = node_p->next)
   {
-    char includeDirs[];
+    if (!(node_p->needsRecompilation))
+    {
+      continue;
+    }
+
+    int numDirsToBeIncluded = 0;
+    Path_Part_Struct dirPathsToBeIncluded[MAX_INCLUDE_PATHS] = {0}; 
+
+    for (int i = 0; i < node_p->numDependencies; i++)
+    {
+      File_List_Node_Struct* dependency_p = node_p->dependencies[i];
+      Path_Part_Struct currentPathPart = get_dir_part(dependency_p->path);
+      bool foundDirPath = false;
+
+      for (int i = 0; i < numDirsToBeIncluded; i++)
+      {
+        if (path_part_equal(&currentPathPart, &(dirPathsToBeIncluded[i])))
+        {
+          foundDirPath = true;
+          break;
+        }
+      }
+      
+      if (!foundDirPath)
+      {
+        assert(numDirsToBeIncluded < MAX_INCLUDE_PATHS);
+        dirPathsToBeIncluded[numDirsToBeIncluded] = currentPathPart;
+        numDirsToBeIncluded++;
+      }
+    }
+
     // TODO: ensure no buffer overflow
-    char command[] = "gcc -c %s -I ";
-    system()
+    char command[MAX_COMMAND_LENGTH] = "gcc -c ";
+    if (numDirsToBeIncluded == 0)
+    {
+      strcat(command, node_p->path);
+      printf("DO COMMAND: %s\n", command);
+      system(command);
+    } 
+    else 
+    {
+      strcat(command, node_p->path);
+      strcat(command, " -I ");
+      for (int i = 0; i < numDirsToBeIncluded; i++)
+      {
+        strncat(command, dirPathsToBeIncluded[i].path_p, dirPathsToBeIncluded[i].length);
+        strcat(command, " ");
+      }
+      printf("DO COMMAND: %s\n", command);
+      system(command);
+    }
+
   }
+
+
+  char linkCommand[MAX_COMMAND_LENGTH] = "gcc -o cbuild ";
+  for (File_List_Node_Struct* node_p = c_files.first; node_p != NULL; node_p = node_p->next) 
+  {
+    
+  }
+  printf("DO COMMAND: %s\n", );
+
 }
 
