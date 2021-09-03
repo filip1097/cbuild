@@ -126,7 +126,7 @@ void do_gcc_calls()
 
 
   char linkCommand[MAX_COMMAND_LENGTH] = "gcc ";
-  strcat(linkCommand, "-o ./cbuild ");
+  strcat(linkCommand, "-o ./build/cbuild ");
   for (File_List_Node_Struct* node_p = c_files.first; node_p != NULL; node_p = node_p->next) 
   {
     strcat_object_file_path(linkCommand, buildFolderPath, node_p->fileName_p);
