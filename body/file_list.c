@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "file_list.h"
+#include "path_util.h"
 
 /*> Defines **********************************************************************************************************/
 
@@ -25,8 +26,14 @@
 /*> Local Variable Definitions ***************************************************************************************/
 
 /*> Local Function Declarations **************************************************************************************/
+static void print_file_list_node(File_List_Node_Struct* node_p);
 
 /*> Local Function Definitions ***************************************************************************************/
+static void print_file_list_node(File_List_Node_Struct* node_p)
+{
+  printf("Path: %s\n", node_p->path);
+  printf("--compile: %d\n", node_p->needsRecompilation);
+}
 
 /*> Global Function Definitions **************************************************************************************/
 
@@ -39,13 +46,13 @@ void add_to_file_list(File_List_Struct* list, char* path_p)
   
   assert(strlen(path_p) < MAX_PATH_LENGTH);
   strcpy(new_node->path, path_p);
-  char* lastBackSlash_p = strrchr(new_node->path, '\\');
-  if (lastBackSlash_p == NULL)
+  char* lastPathSeperator_p = strrchr(new_node->path, PATH_SEPERATOR);
+  if (lastPathSeperator_p == NULL)
   {
     new_node->fileName_p = new_node->path;
   }
   else{
-    new_node->fileName_p = (lastBackSlash_p + 1);
+    new_node->fileName_p = (lastPathSeperator_p + 1);
   }
 
   if (list->first == NULL) 
@@ -91,5 +98,13 @@ void add_dependencies_to_file_node(File_List_Node_Struct* dest_node, File_List_N
     {
       add_dependency_to_file_node(dest_node, src_node->dependencies[i]);
     }
+  }
+}
+
+void print_file_list(File_List_Struct* fileList_p)
+{
+  for (File_List_Node_Struct* node_p = fileList_p->first; node_p != NULL; node_p = node_p->next)
+  {
+    print_file_list_node(node_p);
   }
 }

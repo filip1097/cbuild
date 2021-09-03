@@ -33,9 +33,12 @@ typedef struct JSON_Struct
   bool hasName;
   char name[JSON_MAX_STRING_LENGTH];
 
-  char stringValue[JSON_MAX_STRING_LENGTH];
   int numChildren;
-  struct JSON_Struct* children[JSON_MAX_NUM_CHILDREN];
+  union
+  {
+    struct JSON_Struct* children[JSON_MAX_NUM_CHILDREN];
+    char stringValue[JSON_MAX_STRING_LENGTH];
+  };
 } JSON_Struct;
 
 /*> Constant Declarations ********************************************************************************************/
@@ -43,11 +46,21 @@ typedef struct JSON_Struct
 /*> Variable Declarations ********************************************************************************************/
 
 /*> Function Declarations ********************************************************************************************/
+void add_child_to_json(JSON_Struct* parent_p, JSON_Struct* newChild_p);
+static inline void add_string_value_to_json(JSON_Struct* json_p, char* string_p)
+{
+  // TODO: ensure no buffer overflow
+  strcpy(json_p->stringValue, string_p);
+}
+
 JSON_Struct* parse_json(char* filePath_p);
 
 void free_json(JSON_Struct* json_p);
 
+JSON_Struct* new_json_struct(JSON_Type_Enum type, char* name_p);
+
 void pretty_print_json(JSON_Struct* json_p);
+void pretty_print_json_to_file(JSON_Struct* json_p, char* filePath_p);
 
 /*> End of Multiple Inclusion Protection *****************************************************************************/
 #endif 

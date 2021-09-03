@@ -64,6 +64,7 @@ static void close_json_object_or_array(JSON_Parser_Struct* parser_p);
 static void add_string_value(JSON_Parser_Struct* parser_p, char* string_p);
 
 static void print_json(JSON_Struct* json_p, char* indent_p);
+static void print_json_to_file(FILE* file_p, JSON_Struct* json_p, char* indent_p);
 
 /*> Local Function Definitions ***************************************************************************************/
 static JSON_Struct* parse_json_element(JSON_Parser_Struct* parser_p)
@@ -235,13 +236,8 @@ static void handle_parsing_stage_expecting_comma_or_array_close(JSON_Parser_Stru
 static void create_json_struct(JSON_Parser_Struct* parser_p, JSON_Type_Enum type, char* name_p)
 {
   JSON_Struct* oldStruct_p = parser_p->currentJSONStruct_p;
-
-  JSON_Struct* newStruct_p = malloc(sizeof(*newStruct_p));
-  newStruct_p->type = type;
+  JSON_Struct* newStruct_p = new_json_struct(type, name_p);
   newStruct_p->parent_p = oldStruct_p;
-  newStruct_p->numChildren = 0;
-  newStruct_p->hasName = strlen(name_p) != 0;
-  strcpy(newStruct_p->name, name_p);
 
   if (type == JSON_TYPE_OBJECT || type == JSON_TYPE_ARRAY)
   {
@@ -370,7 +366,66 @@ static void print_json(JSON_Struct* json_p, char* indent_p)
   }
 }
 
+static void print_json_to_file(FILE* file_p, JSON_Struct* json_p, char* indent_p)
+{
+  // print indent_p
+  fprintf(file_p, "%s", indent_p);
+
+  if (json_p->hasName)
+  {
+    fprintf(file_p, "\"%s\" : ", json_p->name);
+  }
+
+  switch(json_p->type)
+  {
+  case JSON_TYPE_OBJECT:
+    fprintf(file_p, "{\n");
+    break;
+  case JSON_TYPE_ARRAY:
+    fprintf(file_p, "[\n");
+    break;
+  case JSON_TYPE_STRING:
+    fprintf(file_p, "\"%s\"", json_p->stringValue);
+    break;
+  }
+
+  char newIndent[JSON_MAX_STRING_LENGTH] = {0};
+  strcpy(newIndent, indent_p);
+  strcat(newIndent, "  ");
+  for (int i = 0; i < json_p->numChildren; i++)
+  {
+    print_json_to_file(file_p, json_p->children[i], newIndent);
+    if (i != json_p->numChildren - 1)
+    {
+      fprintf(file_p, ",\n");
+    }
+    else 
+    {
+      fprintf(file_p, "\n");
+    }
+  }
+
+  switch(json_p->type)
+  {
+  case JSON_TYPE_OBJECT:
+    fprintf(file_p, "%s}", indent_p);
+    break;
+  case JSON_TYPE_ARRAY:
+    fprintf(file_p, "%s]", indent_p);
+    break;
+  }
+}
+
 /*> Global Function Definitions **************************************************************************************/
+
+void add_child_to_json(JSON_Struct* parent_p, JSON_Struct* newChild_p)
+{
+  newChild_p->parent_p = parent_p;
+
+  parent_p->children[parent_p->numChildren] = newChild_p;
+  parent_p->numChildren++;
+  assert(parent_p->numChildren < JSON_MAX_NUM_CHILDREN);
+}
 
 JSON_Struct* parse_json(char* filePath_p)
 {
@@ -395,9 +450,27 @@ void free_json(JSON_Struct* json_p)
   free(json_p);
 }
 
+JSON_Struct* new_json_struct(JSON_Type_Enum type, char* name_p)
+{
+  JSON_Struct* newStruct_p = malloc(sizeof(*newStruct_p));
+  newStruct_p->type = type;
+  newStruct_p->parent_p = NULL;
+  newStruct_p->numChildren = 0;
+  newStruct_p->hasName = strlen(name_p) != 0;
+  strcpy(newStruct_p->name, name_p);
+  return newStruct_p;
+}
+
 void pretty_print_json(JSON_Struct* json_p)
 {
   printf("\n");
   print_json(json_p, "");
   printf("\n");
+}
+
+void pretty_print_json_to_file(JSON_Struct* json_p, char* filePath_p)
+{
+  FILE* file_p = fopen(filePath_p, "w");
+  print_json_to_file(file_p, json_p, "");
+  fclose(file_p);
 }

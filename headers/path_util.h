@@ -11,9 +11,15 @@
 /*> Includes *********************************************************************************************************/
 
 #include <stdbool.h>
+#include <string.h>
 #include <sys/stat.h>
 
 /*> Defines **********************************************************************************************************/
+#if defined _WIN32
+  #define PATH_SEPERATOR '\\'
+#elif defined __linux__
+  #define PATH_SEPERATOR '/'
+#endif
 
 /*> Type Declarations ************************************************************************************************/
 typedef struct Path_Part_Struct
@@ -28,7 +34,7 @@ typedef struct Path_Part_Struct
 
 /*> Function Declarations ********************************************************************************************/
 
-static inline bool file_exists(char* path_p)
+static inline bool entry_exists(char* path_p)
 {
   struct stat status;
   return stat(path_p, &status) == 0;

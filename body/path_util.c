@@ -36,15 +36,19 @@ void join_paths(char* dest, char* left_path, char* right_path)
 
   assert(MAX_PATH_LENGTH > left_length + right_length + 1);
 
+  char pathSeperatorString[2];
+  pathSeperatorString[0] = PATH_SEPERATOR;
+  pathSeperatorString[1] = '\0';
+
   dest[0] = '\0';
   strcat(dest, left_path);
-  strcat(dest, "\\");
+  strcat(dest, pathSeperatorString);
   strcat(dest, right_path);
 }
 
 Path_Part_Struct get_dir_part(char* path_p)
 {
-  char* lastBackSlash_p = strrchr(path_p, '\\');
-  Path_Part_Struct dirPath = {.path_p = path_p, .length = lastBackSlash_p - path_p + 1};
+  char* lastPathSeperator_p = strrchr(path_p, PATH_SEPERATOR);
+  Path_Part_Struct dirPath = {.path_p = path_p, .length = lastPathSeperator_p - path_p + 1};
   return dirPath; 
 }

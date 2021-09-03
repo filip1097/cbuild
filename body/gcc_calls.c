@@ -18,6 +18,7 @@
 
 #define MAX_INCLUDE_PATHS 100
 #define MAX_COMMAND_LENGTH 1000
+#define MAX_PATH_LENGTH 250
 
 /*> Type Declarations ***************************************************************************************/
 
@@ -30,13 +31,39 @@
 /*> Local Variable Definitions ******************************************************************************/
 
 /*> Local Function Declarations *****************************************************************************/
+static void mkdir_id_not_exists(char* dirPath_p);
+static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char* fileName_p);
 
 /*> Local Function Definitions ******************************************************************************/
+static void mkdir_if_not_exists(char* dirPath_p)
+{
+  if (!entry_exists(dirPath_p))
+  {
+    mkdir(dirPath_p, 0777);
+  }
+
+}
+
+static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char* fileName_p)
+{
+  char* lastPeriodInFileName_p = strrchr(fileName_p, '.');
+  int lengthOfFileNameNotIncludingExtension = lastPeriodInFileName_p - fileName_p;
+  strcat(dest_p, buildFolderPath_p);
+  strcat(dest_p, "/");
+  strncat(dest_p, fileName_p, lengthOfFileNameNotIncludingExtension);
+  strcat(dest_p, ".o ");
+}
 
 /*> Global Function Definitions *****************************************************************************/
 
 void do_gcc_calls()
 {
+  // TODO: ensure no buffer overflow
+  char buildFolderPath[MAX_PATH_LENGTH];
+  sprintf(buildFolderPath, ".%cbuild", PATH_SEPERATOR);
+
+  mkdir_if_not_exists(buildFolderPath);
+
   for (File_List_Node_Struct* node_p = c_files.first; node_p != NULL; node_p = node_p->next)
   {
     if (!(node_p->needsRecompilation))
@@ -75,12 +102,16 @@ void do_gcc_calls()
     if (numDirsToBeIncluded == 0)
     {
       strcat(command, node_p->path);
+      strcat(command, " -o ");
+      strcat_object_file_path(command, buildFolderPath, node_p->fileName_p);
       printf("DO COMMAND: %s\n", command);
       system(command);
     } 
     else 
     {
       strcat(command, node_p->path);
+      strcat(command, " -o ");
+      strcat_object_file_path(command, buildFolderPath, node_p->fileName_p);
       strcat(command, " -I ");
       for (int i = 0; i < numDirsToBeIncluded; i++)
       {
@@ -94,12 +125,14 @@ void do_gcc_calls()
   }
 
 
-  char linkCommand[MAX_COMMAND_LENGTH] = "gcc -o cbuild ";
+  char linkCommand[MAX_COMMAND_LENGTH] = "gcc ";
+  strcat(linkCommand, "-o ./cbuild ");
   for (File_List_Node_Struct* node_p = c_files.first; node_p != NULL; node_p = node_p->next) 
   {
-    
+    strcat_object_file_path(linkCommand, buildFolderPath, node_p->fileName_p);
   }
-  printf("DO COMMAND: %s\n", );
+  printf("DO COMMAND: %s\n", linkCommand);
+  system(linkCommand);
 
 }
 

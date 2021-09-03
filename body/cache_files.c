@@ -1,5 +1,5 @@
-/*> Description ******************************************************************************************************/
-/**
+/*> Description ******************************************************************************************************/ 
+/** 
 * @brief Defines functions to cache files.
 * @file cache_files.c
 */
@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "char_util.h"
 #include "file_list.h"
 #include "globals.h"
 #include "int_util.h"
@@ -17,7 +18,11 @@
 /*> Defines **********************************************************************************************************/
 #define CHAR_BIT_LENGTH 8
 
+#define CHECKSUM_STRING_LENGTH 20
+
 #define LINE_BUFFER_LENGTH 200
+
+#define ESCAPE_CHAR '\\'
 
 #define PLACEHOLDER_CHAR ' '
 
@@ -91,6 +96,10 @@ static inline void add_to_line_buffer(Line_Buffer_Struct* scanned_line, char ch)
 
 static void parse_and_add_include(File_List_Node_Struct* file_node, Line_Buffer_Struct* scanned_line);
 
+static JSON_Struct* create_file_json_object(File_List_Node_Struct* fileNode_p);
+
+static void convert_checksum_to_string(uint64_t checksum, char checksumString[CHECKSUM_STRING_LENGTH]);
+
 /*> Local Function Definitions ***************************************************************************************/
 
 static void checksum_file(File_List_Node_Struct* fileNode_p)
@@ -107,7 +116,7 @@ static void checksum_file(File_List_Node_Struct* fileNode_p)
   char current_char = fgetc(file);
   while (current_char != EOF) {
     /* escape chars */
-    current_char = scan_status.prev_char == '\\' ? PLACEHOLDER_CHAR : current_char;
+    current_char = scan_status.prev_char == ESCAPE_CHAR ? PLACEHOLDER_CHAR : current_char;
     
     process_scanned_char(fileNode_p, &scan_status, &scanned_line, current_char);
     update_checksum(&cache, current_char);
@@ -331,6 +340,34 @@ static void parse_and_add_include(File_List_Node_Struct* file_node, Line_Buffer_
   }
 }
 
+static JSON_Struct* create_file_json_object(File_List_Node_Struct* fileNode_p)
+{
+  JSON_Struct* fileObject_p = new_json_struct(JSON_TYPE_OBJECT, "");
+
+  JSON_Struct* fileAttribute_p = new_json_struct(JSON_TYPE_STRING, "file");
+  add_string_value_to_json(fileAttribute_p, fileNode_p->path);
+  add_child_to_json(fileObject_p, fileAttribute_p);
+
+  JSON_Struct* checksumAttribute_p = new_json_struct(JSON_TYPE_STRING, "checksum");
+  char checksumString[CHECKSUM_STRING_LENGTH] = {0};
+  convert_checksum_to_string(fileNode_p->checksum, checksumString);
+  add_string_value_to_json(checksumAttribute_p, checksumString);
+  add_child_to_json(fileObject_p, checksumAttribute_p);
+
+  return fileObject_p;
+}
+
+static void convert_checksum_to_string(uint64_t checksum, char checksumString[CHECKSUM_STRING_LENGTH])
+{
+  checksumString[19] = '\0';
+
+  for (int i = 18; i >= 0; i--)
+  {
+    checksumString[i] = char_parse_digit(checksum % 10);
+    checksum = checksum / 10;
+  }
+}
+
 /*> Global Function Definitions **************************************************************************************/
 
 void checksum_files()
@@ -348,7 +385,7 @@ void checksum_files()
 
 bool load_stored_cache(char* pathToCache_p)
 {
-  if (file_exists(pathToCache_p))
+  if (entry_exists(pathToCache_p))
   {
     JSON_Struct* jsonCache_p = parse_json(pathToCache_p);
 
@@ -381,6 +418,25 @@ bool load_stored_cache(char* pathToCache_p)
     return true;
   }
   return false;
+}
+
+void write_cache(char* path_p)
+{
+  JSON_Struct* jsonList_p = new_json_struct(JSON_TYPE_ARRAY, "");
+
+  for (File_List_Node_Struct* node_p = c_files.first; node_p != NULL; node_p = node_p->next) {
+    JSON_Struct* fileObject_p = create_file_json_object(node_p);
+    add_child_to_json(jsonList_p, fileObject_p);
+  }
+
+  for (File_List_Node_Struct* node_p = h_files.first; node_p != NULL; node_p = node_p->next) {
+    JSON_Struct* fileObject_p = create_file_json_object(node_p);
+    add_child_to_json(jsonList_p, fileObject_p);
+  }
+
+  pretty_print_json_to_file(jsonList_p, path_p);
+
+  free_json(jsonList_p);
 }
 
 void determine_files_to_be_recompiled()

@@ -15,9 +15,6 @@
 #include "gcc_calls.h"
 #include "globals.h"
 
-    #include <inttypes.h>
-    #include "path_util.h"
-
 /*> Defines **********************************************************************************************************/
 #define CURRENT_DIR_PATH "."
 #define CACHE_PATH ".cBuildCache"
@@ -47,42 +44,8 @@ int main()
     determine_files_to_be_recompiled();
   }
 
-  for (File_List_Node_Struct* node = c_files.first; node != NULL; node = node->next)
-  {
-    printf("C node: name=%s, cache=%" PRIu64 ", needsCompilation=%d\n", 
-              node->path, node->checksum, node->needsRecompilation);
-    for (int i = 0; i < node->numDependencies; i++)
-    {
-      printf("--Dependency = %s\n", node->dependencies[i]);
-    }
-  }
-
-  for (File_List_Node_Struct* node = h_files.first; node != NULL; node = node->next)
-  {
-    printf("H node: name=%s, cache=%" PRIu64 ", needsCompilation=%d\n", 
-              node->path, node->checksum, node->needsRecompilation);
-    for (int i = 0; i < node->numDependencies; i++)
-    {
-      printf("--Dependency = %s\n", node->dependencies[i]);
-    }
-  }
-
-  for (File_List_Node_Struct* node = cached_files.first; node != NULL; node = node->next)
-  {
-    printf("Cached node: name=%s, cache=%" PRIu64 ", needsCompilation=%d\n", 
-              node->path, node->checksum, node->needsRecompilation);
-    for (int i = 0; i < node->numDependencies; i++)
-    {
-      printf("--Dependency = %s\n", node->dependencies[i]);
-    }
-  }
-
   do_gcc_calls();
-
-
-  // compile files and link
-
-  // write cache
+  write_cache(CACHE_PATH);
 
   return 0;
 }
