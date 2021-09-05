@@ -1,7 +1,7 @@
 /*> Description ******************************************************************************************************/ 
 /** 
 * @brief Defines functions to cache files.
-* @file cache_files.c
+* @file checksum_files.c
 */
 
 /*> Includes *********************************************************************************************************/
@@ -71,7 +71,7 @@ typedef struct Include_Line_Parser_Struct
 
 /*> Local Function Declarations **************************************************************************************/
 
-static void checksum_file(File_List_Node_Struct* file);
+static void checksum_and_find_includes_for_file(File_List_Node_Struct* file);
 
 static inline bool scanning_comment_or_literal(Scanning_Status_Struct* scan_status);
 
@@ -102,7 +102,7 @@ static void convert_checksum_to_string(uint64_t checksum, char checksumString[CH
 
 /*> Local Function Definitions ***************************************************************************************/
 
-static void checksum_file(File_List_Node_Struct* fileNode_p)
+static void checksum_and_find_includes_for_file(File_List_Node_Struct* fileNode_p)
 {
   FILE* file = fopen(fileNode_p->path, "r");
 
@@ -329,7 +329,7 @@ static void parse_and_add_include(File_List_Node_Struct* file_node, Line_Buffer_
 
     int file_name_length = line_parser.last_filename_char_index - line_parser.first_filename_char_index + 1;
     File_List_Node_Struct* include_file_node = 
-        find_file_node(&h_files,
+        find_file_node(&hFiles,
                       (start_of_include + line_parser.first_filename_char_index),
                       file_name_length);
     if (include_file_node != NULL)
@@ -369,67 +369,32 @@ static void convert_checksum_to_string(uint64_t checksum, char checksumString[CH
 }
 
 /*> Global Function Definitions **************************************************************************************/
-
-void checksum_files()
+void checksum_and_find_includes()
 {
-  for (File_List_Node_Struct* fileNode_p = c_files.first; fileNode_p != NULL; fileNode_p = fileNode_p->next)
+  for (File_List_Node_Struct* fileNode_p = cFiles.first; fileNode_p != NULL; fileNode_p = fileNode_p->next)
   {
-    checksum_file(fileNode_p);
+    checksum_and_find_includes_for_file(fileNode_p);
   }
 
-  for (File_List_Node_Struct* fileNode_p = h_files.first; fileNode_p != NULL; fileNode_p = fileNode_p->next)
+  for (File_List_Node_Struct* fileNode_p = hFiles.first; fileNode_p != NULL; fileNode_p = fileNode_p->next)
   {
-    checksum_file(fileNode_p);
+    checksum_and_find_includes_for_file(fileNode_p);
   }
-}
 
-bool load_stored_cache(char* pathToCache_p)
-{
-  if (entry_exists(pathToCache_p))
-  {
-    JSON_Struct* jsonCache_p = parse_json(pathToCache_p);
-
-    for (int i = 0; i < jsonCache_p->numChildren; i++)
-    {
-      JSON_Struct* fileObject_p = jsonCache_p->children[i];
-      uint64_t checksum;
-      char* name_p;
-
-      for (int j = 0; j < fileObject_p->numChildren; j++)
-      {
-        JSON_Struct* attribute_p = fileObject_p->children[j];
-        
-        if (strcmp(attribute_p->name, "file") == 0)
-        {
-          name_p = attribute_p->stringValue;
-        }
-        else if (strcmp(attribute_p->name, "checksum") == 0)
-        {
-          checksum = parseUint64_t(attribute_p->stringValue);
-        }
-      }
-
-      add_to_file_list(&cached_files, name_p);
-      cached_files.last->checksum = checksum;
-    }
-    
-    free_json(jsonCache_p);
-    
-    return true;
-  }
-  return false;
+  printf("(%d) STEP CHECKSUM AND FIND INCLUDES\n", stepCounter);
+  stepCounter++;
 }
 
 void write_cache(char* path_p)
 {
   JSON_Struct* jsonList_p = new_json_struct(JSON_TYPE_ARRAY, "");
 
-  for (File_List_Node_Struct* node_p = c_files.first; node_p != NULL; node_p = node_p->next) {
+  for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next) {
     JSON_Struct* fileObject_p = create_file_json_object(node_p);
     add_child_to_json(jsonList_p, fileObject_p);
   }
 
-  for (File_List_Node_Struct* node_p = h_files.first; node_p != NULL; node_p = node_p->next) {
+  for (File_List_Node_Struct* node_p = hFiles.first; node_p != NULL; node_p = node_p->next) {
     JSON_Struct* fileObject_p = create_file_json_object(node_p);
     add_child_to_json(jsonList_p, fileObject_p);
   }
@@ -439,17 +404,3 @@ void write_cache(char* path_p)
   free_json(jsonList_p);
 }
 
-void determine_files_to_be_recompiled()
-{
-  for (File_List_Node_Struct* node_p = c_files.first; node_p != NULL; node_p = node_p->next)
-  {
-    char* nodeName_p = node_p->fileName_p;
-    int nameLength = strlen(nodeName_p);
-
-    File_List_Node_Struct* cachedNode_p = find_file_node(&cached_files, nodeName_p, nameLength);
-    if (cachedNode_p != NULL)
-    {
-      node_p->needsRecompilation = !(node_p->checksum == cachedNode_p->checksum);
-    }
-  }
-}

@@ -8,12 +8,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "cache_files.h"
+#include "calc_compile.h"
 #include "calc_dependencies.h"
+#include "checksum_files.h"
 #include "file_list.h"
 #include "file_search.h"
 #include "gcc_calls.h"
 #include "globals.h"
+#include "load_cache.h"
 
 /*> Defines **********************************************************************************************************/
 #define CURRENT_DIR_PATH "."
@@ -35,13 +37,13 @@
 int main()
 {
   find_files(CURRENT_DIR_PATH); 
-  checksum_files();
+  checksum_and_find_includes();
   calc_dependencies();
 
   bool foundStoredCache = load_stored_cache(CACHE_PATH);
   if (foundStoredCache)
   {
-    determine_files_to_be_recompiled();
+    determine_files_to_compile();
   }
 
   do_gcc_calls();

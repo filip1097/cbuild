@@ -32,39 +32,41 @@ static void print_file_list_node(File_List_Node_Struct* node_p);
 static void print_file_list_node(File_List_Node_Struct* node_p)
 {
   printf("Path: %s\n", node_p->path);
-  printf("--compile: %d\n", node_p->needsRecompilation);
+  printf("--compile: %d\n", node_p->toBeCompiled);
 }
 
 /*> Global Function Definitions **************************************************************************************/
 
-void add_to_file_list(File_List_Struct* list, char* path_p)
+void add_to_file_list(File_List_Struct* list_p, char* path_p)
 {
-  File_List_Node_Struct* new_node = malloc(sizeof(*new_node));
-  new_node->numDependencies = 0;
-  new_node->next = NULL;
-  new_node->needsRecompilation = true;
+  File_List_Node_Struct* newNode_p = malloc(sizeof(*newNode_p));
+  newNode_p->numDependencies = 0;
+  newNode_p->next = NULL;
+  newNode_p->toBeCompiled = true;
   
   assert(strlen(path_p) < MAX_PATH_LENGTH);
-  strcpy(new_node->path, path_p);
-  char* lastPathSeperator_p = strrchr(new_node->path, PATH_SEPERATOR);
+  strcpy(newNode_p->path, path_p);
+  char* lastPathSeperator_p = strrchr(newNode_p->path, PATH_SEPERATOR);
   if (lastPathSeperator_p == NULL)
   {
-    new_node->fileName_p = new_node->path;
+    newNode_p->fileName_p = newNode_p->path;
   }
   else{
-    new_node->fileName_p = (lastPathSeperator_p + 1);
+    newNode_p->fileName_p = (lastPathSeperator_p + 1);
   }
 
-  if (list->first == NULL) 
+  if (list_p->first == NULL) 
   {
-    list->first = new_node;
-    list->last = new_node;
+    list_p->first = newNode_p;
+    list_p->last = newNode_p;
   }
   else
   {
-    list->last->next = new_node;
-    list->last = new_node;
+    list_p->last->next = newNode_p;
+    list_p->last = newNode_p;
   }
+
+  list_p->length++;
 }
 
 File_List_Node_Struct* find_file_node(File_List_Struct* list_p, char* const fileName_p, int fileNameLength)

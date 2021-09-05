@@ -48,6 +48,8 @@ static void calc_dependencies_for_list(File_List_Struct* fileList_p)
 
 void calc_dependencies() 
 {
-  calc_dependencies_for_list(&c_files);
-  calc_dependencies_for_list(&h_files);
+  calc_dependencies_for_list(&cFiles);
+  calc_dependencies_for_list(&hFiles);
+  printf("(%d) STEP CALCULATE DEPENDENCIES\n", stepCounter);
+  stepCounter++;
 }

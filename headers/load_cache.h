@@ -1,15 +1,14 @@
 /*> Description ******************************************************************************************************/
 /**
- * @brief Header file for functions for searching for files.
- * @file file_search.h
+ * @brief Header file functions to find and load cache.
+ * @file load_cache.h
  */
 
 /*> Multiple Inclusion Protection ************************************************************************************/
-#ifndef FILE_SEARCH_H
-#define FILE_SEARCH_H
+#ifndef LOAD_CACHE_H
+#define LOAD_CACHE_H
 
 /*> Includes *********************************************************************************************************/
-#include "file_list.h"
 
 /*> Defines **********************************************************************************************************/
 
@@ -20,8 +19,7 @@
 /*> Variable Declarations ********************************************************************************************/
 
 /*> Function Declarations ********************************************************************************************/
-
-void find_files(char* projectPath_p);
+bool load_stored_cache(char* path_p);
 
 /*> End of Multiple Inclusion Protection *****************************************************************************/
 #endif 

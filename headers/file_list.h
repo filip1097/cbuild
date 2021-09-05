@@ -28,13 +28,18 @@ typedef struct File_List_Node_Struct
   struct File_List_Node_Struct* dependencies[MAX_DEPENDENCIES];
   int numDependencies;
   struct File_List_Node_Struct* next;
-  bool needsRecompilation;
+
+  union {
+    bool toBeCompiled;
+    bool hasChanged;
+  };
 } File_List_Node_Struct;
 
 typedef struct File_List_Struct 
 {
   File_List_Node_Struct* first;
   File_List_Node_Struct* last;
+  int length;
 } File_List_Struct;
 
 /*> Constant Declarations ********************************************************************************************/

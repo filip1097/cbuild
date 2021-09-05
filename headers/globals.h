@@ -18,9 +18,11 @@
 /*> Constant Declarations ********************************************************************************************/
 
 /*> Variable Declarations ********************************************************************************************/
-extern File_List_Struct c_files;
-extern File_List_Struct h_files;
-extern File_List_Struct cached_files;
+extern File_List_Struct cFiles;
+extern File_List_Struct hFiles;
+extern File_List_Struct oFiles;
+extern File_List_Struct cachedFiles;
+extern int stepCounter;
 
 /*> Function Declarations ********************************************************************************************/
 

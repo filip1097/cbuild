@@ -1,15 +1,14 @@
 /*> Description ******************************************************************************************************/
 /**
- * @brief Header file for functions for searching for files.
- * @file file_search.h
+ * @brief Header file functions to calculated which functions to compile.
+ * @file calc_compile.h
  */
 
 /*> Multiple Inclusion Protection ************************************************************************************/
-#ifndef FILE_SEARCH_H
-#define FILE_SEARCH_H
+#ifndef CALC_COMPILE_H
+#define CALC_COMPILE_H
 
 /*> Includes *********************************************************************************************************/
-#include "file_list.h"
 
 /*> Defines **********************************************************************************************************/
 
@@ -20,8 +19,7 @@
 /*> Variable Declarations ********************************************************************************************/
 
 /*> Function Declarations ********************************************************************************************/
-
-void find_files(char* projectPath_p);
+void determine_files_to_compile();
 
 /*> End of Multiple Inclusion Protection *****************************************************************************/
 #endif 

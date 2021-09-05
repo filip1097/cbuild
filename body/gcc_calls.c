@@ -31,7 +31,7 @@
 /*> Local Variable Definitions ******************************************************************************/
 
 /*> Local Function Declarations *****************************************************************************/
-static void mkdir_id_not_exists(char* dirPath_p);
+static void mkdir_if_not_exists(char* dirPath_p);
 static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char* fileName_p);
 
 /*> Local Function Definitions ******************************************************************************/
@@ -64,9 +64,9 @@ void do_gcc_calls()
 
   mkdir_if_not_exists(buildFolderPath);
 
-  for (File_List_Node_Struct* node_p = c_files.first; node_p != NULL; node_p = node_p->next)
+  for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next)
   {
-    if (!(node_p->needsRecompilation))
+    if (!(node_p->toBeCompiled))
     {
       continue;
     }
@@ -127,7 +127,7 @@ void do_gcc_calls()
 
   char linkCommand[MAX_COMMAND_LENGTH] = "gcc ";
   strcat(linkCommand, "-o ./build/cbuild ");
-  for (File_List_Node_Struct* node_p = c_files.first; node_p != NULL; node_p = node_p->next) 
+  for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next) 
   {
     strcat_object_file_path(linkCommand, buildFolderPath, node_p->fileName_p);
   }

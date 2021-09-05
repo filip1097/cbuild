@@ -14,9 +14,11 @@
 /*> Global Constant Definitions **************************************************************************************/
 
 /*> Global Variable Definitions **************************************************************************************/
-File_List_Struct c_files = { .first = NULL, .last = NULL };
-File_List_Struct h_files = { .first = NULL, .last = NULL };
-File_List_Struct cached_files = { .first = NULL, .last = NULL };
+File_List_Struct cFiles = { .first = NULL, .last = NULL, .length = 0 };
+File_List_Struct hFiles = { .first = NULL, .last = NULL, .length = 0 };
+File_List_Struct oFiles = { .first = NULL, .last = NULL, .length = 0 };
+File_List_Struct cachedFiles = { .first = NULL, .last = NULL, .length = 0 };
+int stepCounter = 1;
 
 /*> Local Constant Definitions ***************************************************************************************/
 
