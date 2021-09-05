@@ -31,10 +31,42 @@
 /*> Local Variable Definitions ******************************************************************************/
 
 /*> Local Function Declarations *****************************************************************************/
+static void determine_dir_paths_to_include(File_List_Node_Struct* fileNode_p,
+                                           int* numDirsToInclude_p,
+                                           Path_Part_Struct* dirPathsToInclude_p);
 static void mkdir_if_not_exists(char* dirPath_p);
 static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char* fileName_p);
 
 /*> Local Function Definitions ******************************************************************************/
+static void determine_dir_paths_to_include(File_List_Node_Struct* fileNode_p,
+                                           int* numDirsToInclude_p, 
+                                           Path_Part_Struct* dirPathsToInclude_p)
+{
+  for (int i = 0; i < node_p->numDependencies; i++)
+  {
+    File_List_Node_Struct* dependency_p = node_p->dependencies[i];
+    Path_Part_Struct currentPathPart = get_dir_part(dependency_p->path);
+    bool foundDirPath = false;
+
+    for (int i = 0; i < numDirsToBeIncluded; i++)
+    {
+      if (path_part_equal(&currentPathPart, &(dirPathsToBeIncluded[i])))
+      {
+        foundDirPath = true;
+        break;
+      }
+    }
+      
+    if (!foundDirPath)
+    {
+      assert(numDirsToBeIncluded < MAX_INCLUDE_PATHS);
+      dirPathsToBeIncluded[numDirsToBeIncluded] = currentPathPart;
+      numDirsToBeIncluded++;
+    }
+  }
+}
+
+
 static void mkdir_if_not_exists(char* dirPath_p)
 {
   if (!entry_exists(dirPath_p))
@@ -55,8 +87,7 @@ static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char*
 }
 
 /*> Global Function Definitions *****************************************************************************/
-
-void do_gcc_calls()
+void compile_object_files()
 {
   // TODO: ensure no buffer overflow
   char buildFolderPath[MAX_PATH_LENGTH];
@@ -72,30 +103,8 @@ void do_gcc_calls()
     }
 
     int numDirsToBeIncluded = 0;
-    Path_Part_Struct dirPathsToBeIncluded[MAX_INCLUDE_PATHS] = {0}; 
-
-    for (int i = 0; i < node_p->numDependencies; i++)
-    {
-      File_List_Node_Struct* dependency_p = node_p->dependencies[i];
-      Path_Part_Struct currentPathPart = get_dir_part(dependency_p->path);
-      bool foundDirPath = false;
-
-      for (int i = 0; i < numDirsToBeIncluded; i++)
-      {
-        if (path_part_equal(&currentPathPart, &(dirPathsToBeIncluded[i])))
-        {
-          foundDirPath = true;
-          break;
-        }
-      }
-      
-      if (!foundDirPath)
-      {
-        assert(numDirsToBeIncluded < MAX_INCLUDE_PATHS);
-        dirPathsToBeIncluded[numDirsToBeIncluded] = currentPathPart;
-        numDirsToBeIncluded++;
-      }
-    }
+    Path_Part_Struct dirPathsToBeIncluded[MAX_INCLUDE_PATHS] = {0};
+    determine_dir_paths_to_include(node_p, &numDirsToBeIncluded, dirPathsToBeIncluded);
 
     // TODO: ensure no buffer overflow
     char command[MAX_COMMAND_LENGTH] = "gcc -c ";
@@ -124,7 +133,12 @@ void do_gcc_calls()
 
   }
 
+  printf("(%d) STEP BUILD OBJECT FILES\n", stepCounter);
+  stepCounter++;
+}
 
+void call_linker()
+{
   char linkCommand[MAX_COMMAND_LENGTH] = "gcc ";
   strcat(linkCommand, "-o ./build/cbuild ");
   for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next) 
@@ -134,5 +148,7 @@ void do_gcc_calls()
   printf("DO COMMAND: %s\n", linkCommand);
   system(linkCommand);
 
+  printf("(%d) STEP CALL LINKER\n", stepCounter);
+  stepCounter++;
 }
 

@@ -77,32 +77,34 @@ static void determine_o_files_still_exist(File_List_Struct* fileList_p)
 }
 
 /*> Global Function Definitions **************************************************************************************/
-void determine_files_to_compile()
+void determine_files_to_compile(bool foundCache)
 {
-  determine_files_that_have_changed(&cFiles);
-  determine_files_that_have_changed(&hFiles);
-
-  determine_o_files_still_exist(&cFiles);
-  
-  bool foundNewFileToCompile = false;
-  do 
+  if (foundCache)
   {
-    foundNewFileToCompile = false;
-    for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next)
+    determine_files_that_have_changed(&cFiles);
+    determine_files_that_have_changed(&hFiles);
+    determine_o_files_still_exist(&cFiles);
+  
+    bool foundNewFileToCompile = false;
+    do 
     {
-      if (!node_p->toBeCompiled)
+      foundNewFileToCompile = false;
+      for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next)
       {
-        for (int i = 0; i < node_p->numDependencies; i++)
+        if (!node_p->toBeCompiled)
         {
-          if (node_p->dependencies[i]->hasChanged)
+          for (int i = 0; i < node_p->numDependencies; i++)
           {
-            node_p->toBeCompiled = true;
-            foundNewFileToCompile = true;
+            if (node_p->dependencies[i]->hasChanged)
+            {
+              node_p->toBeCompiled = true;
+              foundNewFileToCompile = true;
+            }
           }
         }
       }
-    }
-  } while (foundNewFileToCompile);
+    } while (foundNewFileToCompile);
+  }
 
   int numFilesToBeCompiled = calc_num_files_to_compile(&cFiles);
 

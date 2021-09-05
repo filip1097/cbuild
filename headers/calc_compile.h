@@ -19,7 +19,7 @@
 /*> Variable Declarations ********************************************************************************************/
 
 /*> Function Declarations ********************************************************************************************/
-void determine_files_to_compile();
+void determine_files_to_compile(bool foundCache);
 
 /*> End of Multiple Inclusion Protection *****************************************************************************/
 #endif 

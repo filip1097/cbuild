@@ -41,10 +41,7 @@ int main()
   calc_dependencies();
 
   bool foundStoredCache = load_stored_cache(CACHE_PATH);
-  if (foundStoredCache)
-  {
-    determine_files_to_compile();
-  }
+  determine_files_to_compile(foundStoredCache);
 
   do_gcc_calls();
   write_cache(CACHE_PATH);
