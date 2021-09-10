@@ -46,6 +46,15 @@ void join_paths(char* dest, char* left_path, char* right_path)
   strcat(dest, right_path);
 }
 
+void make_directory(char* path_p)
+{
+#if defined _WIN32
+  mkdir(path_p);
+#elif defined __linux__
+  mkdir(path_p, 0777);
+#endif
+}
+
 Path_Part_Struct get_dir_part(char* path_p)
 {
   char* lastPathSeperator_p = strrchr(path_p, PATH_SEPERATOR);

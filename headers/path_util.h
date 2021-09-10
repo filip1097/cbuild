@@ -44,6 +44,8 @@ Path_Part_Struct get_dir_part(char* path_p);
 
 void join_paths(char* dest, char* left_path, char* right_path);
 
+void make_directory(char* path_p);
+
 static inline bool path_part_equal(Path_Part_Struct* pathPart1_p, Path_Part_Struct* pathPart2_p)
 {
   return (pathPart1_p->length == pathPart2_p->length) && 

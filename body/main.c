@@ -43,7 +43,8 @@ int main()
   bool foundStoredCache = load_stored_cache(CACHE_PATH);
   determine_files_to_compile(foundStoredCache);
 
-  do_gcc_calls();
+  compile_object_files();
+  call_linker();
   write_cache(CACHE_PATH);
 
   return 0;

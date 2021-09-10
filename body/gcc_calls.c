@@ -5,7 +5,7 @@
 */
 
 /*> Includes ************************************************************************************************/
-
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,15 +42,15 @@ static void determine_dir_paths_to_include(File_List_Node_Struct* fileNode_p,
                                            int* numDirsToInclude_p, 
                                            Path_Part_Struct* dirPathsToInclude_p)
 {
-  for (int i = 0; i < node_p->numDependencies; i++)
+  for (int i = 0; i < fileNode_p->numDependencies; i++)
   {
-    File_List_Node_Struct* dependency_p = node_p->dependencies[i];
+    File_List_Node_Struct* dependency_p = fileNode_p->dependencies[i];
     Path_Part_Struct currentPathPart = get_dir_part(dependency_p->path);
     bool foundDirPath = false;
 
-    for (int i = 0; i < numDirsToBeIncluded; i++)
+    for (int i = 0; i < *numDirsToInclude_p; i++)
     {
-      if (path_part_equal(&currentPathPart, &(dirPathsToBeIncluded[i])))
+      if (path_part_equal(&currentPathPart, &(dirPathsToInclude_p[i])))
       {
         foundDirPath = true;
         break;
@@ -59,9 +59,9 @@ static void determine_dir_paths_to_include(File_List_Node_Struct* fileNode_p,
       
     if (!foundDirPath)
     {
-      assert(numDirsToBeIncluded < MAX_INCLUDE_PATHS);
-      dirPathsToBeIncluded[numDirsToBeIncluded] = currentPathPart;
-      numDirsToBeIncluded++;
+      assert(*numDirsToInclude_p < MAX_INCLUDE_PATHS);
+      dirPathsToInclude_p[*numDirsToInclude_p] = currentPathPart;
+      (*numDirsToInclude_p)++;
     }
   }
 }
@@ -71,17 +71,15 @@ static void mkdir_if_not_exists(char* dirPath_p)
 {
   if (!entry_exists(dirPath_p))
   {
-    mkdir(dirPath_p, 0777);
+    make_directory(dirPath_p);
   }
-
 }
 
 static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char* fileName_p)
 {
   char* lastPeriodInFileName_p = strrchr(fileName_p, '.');
   int lengthOfFileNameNotIncludingExtension = lastPeriodInFileName_p - fileName_p;
-  strcat(dest_p, buildFolderPath_p);
-  strcat(dest_p, "/");
+  sprintf(dest_p, "%s%s%c", dest_p, buildFolderPath_p, PATH_SEPERATOR);
   strncat(dest_p, fileName_p, lengthOfFileNameNotIncludingExtension);
   strcat(dest_p, ".o ");
 }
@@ -139,6 +137,10 @@ void compile_object_files()
 
 void call_linker()
 {
+  // TODO: ensure no buffer overflow
+  char buildFolderPath[MAX_PATH_LENGTH];
+  sprintf(buildFolderPath, ".%cbuild", PATH_SEPERATOR);
+
   char linkCommand[MAX_COMMAND_LENGTH] = "gcc ";
   strcat(linkCommand, "-o ./build/cbuild ");
   for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next) 
