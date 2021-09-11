@@ -77,7 +77,7 @@ static void determine_o_files_still_exist(File_List_Struct* fileList_p)
 }
 
 /*> Global Function Definitions **************************************************************************************/
-void determine_files_to_compile(bool foundCache)
+int determine_files_to_compile(bool foundCache)
 {
   if (foundCache)
   {
@@ -110,4 +110,6 @@ void determine_files_to_compile(bool foundCache)
 
   printf("(%d) STEP DETERMINE FILES TO BE COMPILED: %d files to be compiled\n", stepCounter, numFilesToBeCompiled);
   stepCounter++;
+
+  return numFilesToBeCompiled;
 }

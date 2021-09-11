@@ -77,7 +77,9 @@ static void search_for_files(char* currentPath_p)
 void find_files(char* projectPath_p)
 {
   search_for_files(projectPath_p);
-  printf("(%d) STEP FIND FILES: C-files = %d, H-files = %d, O-files = %d\n", stepCounter, cFiles.length, hFiles.length, oFiles.length);
+  foundExecutable = entry_exists("build/cbuild");
+  printf("(%d) STEP FIND FILES: C-files = %d, H-files = %d, O-files = %d, Executable = %d\n", 
+      stepCounter, cFiles.length, hFiles.length, oFiles.length, foundExecutable);
   stepCounter++;
 }
 

@@ -44,7 +44,18 @@ static JSON_Struct* create_file_json_object(File_List_Node_Struct* fileNode_p)
 
   JSON_Struct* checksumAttribute_p = new_json_struct(JSON_TYPE_STRING, "checksum");
   char checksumString[CHECKSUM_STRING_LENGTH] = {0};
-  convert_checksum_to_string(fileNode_p->checksum, checksumString);
+  uint64_t checksumToCache = 0;
+  if (fileNode_p->failedCompilation)
+  {
+    File_List_Node_Struct* cachedFile = 
+        find_file_node(&cachedFiles, fileNode_p->fileName_p, strlen(fileNode_p->fileName_p));
+    if (cachedFile != NULL) checksumToCache = cachedFile->checksum;
+  }
+  else
+  {
+    checksumToCache = fileNode_p->checksum;
+  }
+  convert_checksum_to_string(checksumToCache, checksumString);
   add_string_value_to_json(checksumAttribute_p, checksumString);
   add_child_to_json(fileObject_p, checksumAttribute_p);
 

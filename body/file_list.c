@@ -43,6 +43,7 @@ void add_to_file_list(File_List_Struct* list_p, char* path_p)
   newNode_p->numDependencies = 0;
   newNode_p->next = NULL;
   newNode_p->toBeCompiled = true;
+  newNode_p->failedCompilation = false;
   
   assert(strlen(path_p) < MAX_PATH_LENGTH);
   strcpy(newNode_p->path, path_p);

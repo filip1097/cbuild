@@ -19,7 +19,11 @@
 
 /*> Defines **********************************************************************************************************/
 #define CURRENT_DIR_PATH "."
-#define CACHE_PATH "build/.cBuildCache"
+#if defined _WIN32
+  #define CACHE_PATH "build\\.cBuildCache"
+#elif defined __linux__
+  #define CACHE_PATH "build/.cBuildCache"
+#endif
 
 /*> Type Declarations ************************************************************************************************/
 
@@ -41,11 +45,20 @@ int main()
   calc_dependencies();
 
   bool foundStoredCache = load_stored_cache(CACHE_PATH);
-  determine_files_to_compile(foundStoredCache);
-
-  compile_object_files();
-  call_linker();
-  write_cache(CACHE_PATH);
+  int numFilesToCompile = determine_files_to_compile(foundStoredCache);
+  
+  if (numFilesToCompile > 0)
+  {
+    compile_object_files();
+  }
+  if (numFilesToCompile > 0 || !foundExecutable)
+  {
+    call_linker();
+  }
+  if (numFilesToCompile > 0)
+  {
+    write_cache(CACHE_PATH);
+  }
 
   return 0;
 }

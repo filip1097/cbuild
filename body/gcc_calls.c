@@ -92,6 +92,8 @@ void compile_object_files()
   sprintf(buildFolderPath, ".%cbuild", PATH_SEPERATOR);
   mkdir_if_not_exists(buildFolderPath);
 
+  int numFilesFailingCompilation = 0;
+
   for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next)
   {
     if (!(node_p->toBeCompiled))
@@ -125,12 +127,17 @@ void compile_object_files()
         strcat(command, " ");
       }
       printf("DO COMMAND: %s\n", command);
-      system(command);
+      int responseCode = system(command);
+      node_p->failedCompilation = (responseCode != 0);
+      if (node_p->failedCompilation)
+      {
+        numFilesFailingCompilation++; 
+      }
     }
-
   }
 
-  printf("(%d) STEP BUILD OBJECT FILES\n", stepCounter);
+  printf("(%d) STEP COMPILE OBJECT FILES: %d files failed compilation\n", 
+      stepCounter, numFilesFailingCompilation);
   stepCounter++;
 }
 

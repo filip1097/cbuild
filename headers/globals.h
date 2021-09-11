@@ -9,6 +9,8 @@
 #define GLOBALS_H
 
 /*> Includes *********************************************************************************************************/
+#include <stdbool.h>
+
 #include "file_list.h"
 
 /*> Defines **********************************************************************************************************/
@@ -22,6 +24,7 @@ extern File_List_Struct cFiles;
 extern File_List_Struct hFiles;
 extern File_List_Struct oFiles;
 extern File_List_Struct cachedFiles;
+extern bool foundExecutable;
 extern int stepCounter;
 
 /*> Function Declarations ********************************************************************************************/

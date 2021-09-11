@@ -33,6 +33,7 @@ typedef struct File_List_Node_Struct
     bool toBeCompiled;
     bool hasChanged;
   };
+  bool failedCompilation;
 } File_List_Node_Struct;
 
 typedef struct File_List_Struct 
