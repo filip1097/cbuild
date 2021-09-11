@@ -18,8 +18,6 @@
 /*> Defines **********************************************************************************************************/
 #define CHAR_BIT_LENGTH 8
 
-#define CHECKSUM_STRING_LENGTH 20
-
 #define LINE_BUFFER_LENGTH 200
 
 #define ESCAPE_CHAR '\\'
@@ -96,9 +94,6 @@ static inline void add_to_line_buffer(Line_Buffer_Struct* scanned_line, char ch)
 
 static void parse_and_add_include(File_List_Node_Struct* file_node, Line_Buffer_Struct* scanned_line);
 
-static JSON_Struct* create_file_json_object(File_List_Node_Struct* fileNode_p);
-
-static void convert_checksum_to_string(uint64_t checksum, char checksumString[CHECKSUM_STRING_LENGTH]);
 
 /*> Local Function Definitions ***************************************************************************************/
 
@@ -340,34 +335,6 @@ static void parse_and_add_include(File_List_Node_Struct* file_node, Line_Buffer_
   }
 }
 
-static JSON_Struct* create_file_json_object(File_List_Node_Struct* fileNode_p)
-{
-  JSON_Struct* fileObject_p = new_json_struct(JSON_TYPE_OBJECT, "");
-
-  JSON_Struct* fileAttribute_p = new_json_struct(JSON_TYPE_STRING, "file");
-  add_string_value_to_json(fileAttribute_p, fileNode_p->path);
-  add_child_to_json(fileObject_p, fileAttribute_p);
-
-  JSON_Struct* checksumAttribute_p = new_json_struct(JSON_TYPE_STRING, "checksum");
-  char checksumString[CHECKSUM_STRING_LENGTH] = {0};
-  convert_checksum_to_string(fileNode_p->checksum, checksumString);
-  add_string_value_to_json(checksumAttribute_p, checksumString);
-  add_child_to_json(fileObject_p, checksumAttribute_p);
-
-  return fileObject_p;
-}
-
-static void convert_checksum_to_string(uint64_t checksum, char checksumString[CHECKSUM_STRING_LENGTH])
-{
-  checksumString[19] = '\0';
-
-  for (int i = 18; i >= 0; i--)
-  {
-    checksumString[i] = char_parse_digit(checksum % 10);
-    checksum = checksum / 10;
-  }
-}
-
 /*> Global Function Definitions **************************************************************************************/
 void checksum_and_find_includes()
 {
@@ -384,23 +351,3 @@ void checksum_and_find_includes()
   printf("(%d) STEP CHECKSUM AND FIND INCLUDES\n", stepCounter);
   stepCounter++;
 }
-
-void write_cache(char* path_p)
-{
-  JSON_Struct* jsonList_p = new_json_struct(JSON_TYPE_ARRAY, "");
-
-  for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next) {
-    JSON_Struct* fileObject_p = create_file_json_object(node_p);
-    add_child_to_json(jsonList_p, fileObject_p);
-  }
-
-  for (File_List_Node_Struct* node_p = hFiles.first; node_p != NULL; node_p = node_p->next) {
-    JSON_Struct* fileObject_p = create_file_json_object(node_p);
-    add_child_to_json(jsonList_p, fileObject_p);
-  }
-
-  pretty_print_json_to_file(jsonList_p, path_p);
-
-  free_json(jsonList_p);
-}
-

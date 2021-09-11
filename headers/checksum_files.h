@@ -21,7 +21,5 @@
 /*> Function Declarations ********************************************************************************************/
 void checksum_and_find_includes();
 
-void write_cache(char* path_p);
-
 /*> End of Multiple Inclusion Protection *****************************************************************************/
 #endif 

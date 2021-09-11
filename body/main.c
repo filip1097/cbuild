@@ -15,7 +15,7 @@
 #include "file_search.h"
 #include "gcc_calls.h"
 #include "globals.h"
-#include "load_cache.h"
+#include "cache.h"
 
 /*> Defines **********************************************************************************************************/
 #define CURRENT_DIR_PATH "."

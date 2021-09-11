@@ -1,12 +1,12 @@
 /*> Description ******************************************************************************************************/
 /**
- * @brief Header file functions to find and load cache.
- * @file load_cache.h
+ * @brief Header file functions to deal with cache.
+ * @file cache.h
  */
 
 /*> Multiple Inclusion Protection ************************************************************************************/
-#ifndef LOAD_CACHE_H
-#define LOAD_CACHE_H
+#ifndef CACHE_H
+#define CACHE_H
 
 /*> Includes *********************************************************************************************************/
 
@@ -20,6 +20,7 @@
 
 /*> Function Declarations ********************************************************************************************/
 bool load_stored_cache(char* path_p);
+void write_cache(char* path_p);
 
 /*> End of Multiple Inclusion Protection *****************************************************************************/
 #endif 

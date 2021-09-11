@@ -90,7 +90,6 @@ void compile_object_files()
   // TODO: ensure no buffer overflow
   char buildFolderPath[MAX_PATH_LENGTH];
   sprintf(buildFolderPath, ".%cbuild", PATH_SEPERATOR);
-
   mkdir_if_not_exists(buildFolderPath);
 
   for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next)
