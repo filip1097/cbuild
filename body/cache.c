@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 
 #include "char_util.h"
 #include "int_util.h"
@@ -76,6 +77,7 @@ static void convert_checksum_to_string(uint64_t checksum, char checksumString[CH
 /*> Global Function Definitions **************************************************************************************/
 bool load_stored_cache(char* pathToCache_p)
 {
+  clock_t start = clock();
   bool foundCache = false;
   if (entry_exists(pathToCache_p))
   {
@@ -108,7 +110,9 @@ bool load_stored_cache(char* pathToCache_p)
     free_json(jsonCache_p);
     foundCache = true;
   }
-  printf("(%d) STEP FIND AND LOAD STORED CACHE: ", stepCounter);
+  clock_t end = clock();
+  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  printf("[%lf s] (%d) FIND AND LOAD STORED CACHE: ", timeTaken, stepCounter);
   if (foundCache)
   {
     printf("true\n");
@@ -123,6 +127,7 @@ bool load_stored_cache(char* pathToCache_p)
 
 void write_cache(char* path_p)
 {
+  clock_t start = clock();
   JSON_Struct* jsonList_p = new_json_struct(JSON_TYPE_ARRAY, "");
 
   for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next) {
@@ -139,6 +144,8 @@ void write_cache(char* path_p)
 
   free_json(jsonList_p);
 
-  printf("(%d) WRITE TO CACHE\n", stepCounter);
+  clock_t end = clock();
+  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  printf("[%lf s] (%d) WRITE TO CACHE\n", timeTaken, stepCounter);
   stepCounter++;
 }

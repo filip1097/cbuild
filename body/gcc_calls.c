@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "file_list.h"
 #include "globals.h"
@@ -88,6 +89,8 @@ static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char*
 /*> Global Function Definitions *****************************************************************************/
 bool compile_object_files()
 {
+  clock_t start = clock();
+
   // TODO: ensure no buffer overflow
   char buildFolderPath[MAX_PATH_LENGTH];
   sprintf(buildFolderPath, ".%cbuild", PATH_SEPERATOR);
@@ -129,8 +132,10 @@ bool compile_object_files()
     }
   }
 
-  printf("(%d) STEP COMPILE OBJECT FILES: %d files failed compilation\n", 
-      stepCounter, numFilesFailingCompilation);
+  clock_t end = clock();
+  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  printf("[%lf s] (%d) COMPILE OBJECT FILES: %d files failed compilation\n", 
+      timeTaken, stepCounter, numFilesFailingCompilation);
   stepCounter++;
 
   return (numFilesFailingCompilation == 0);
@@ -138,6 +143,8 @@ bool compile_object_files()
 
 void call_linker()
 {
+  clock_t start = clock();
+
   // TODO: ensure no buffer overflow
   char buildFolderPath[MAX_PATH_LENGTH];
   sprintf(buildFolderPath, ".%cbuild", PATH_SEPERATOR);
@@ -151,7 +158,9 @@ void call_linker()
   printf("DO COMMAND: %s\n", linkCommand);
   system(linkCommand);
 
-  printf("(%d) STEP CALL LINKER\n", stepCounter);
+  clock_t end = clock();
+  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  printf("[%lf s] (%d) CALL LINKER\n", timeTaken, stepCounter);
   stepCounter++;
 }
 

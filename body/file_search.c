@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "file_list.h"
@@ -103,11 +104,16 @@ static void get_path_of_executable(char* dest_p, int bufferSize)
 /*> Global Function Definitions **************************************************************************************/
 void find_files(char* projectPath_p)
 {
+  clock_t start = clock();
+
   search_for_files(projectPath_p);
   get_path_of_executable(executablePath, MAX_EXE_PATH_LENGTH);
   foundExecutable = entry_exists(executablePath);
-  printf("(%d) STEP FIND FILES: C-files = %d, H-files = %d, O-files = %d, Executable = %d\n", 
-      stepCounter, cFiles.length, hFiles.length, oFiles.length, foundExecutable);
+
+  clock_t end = clock();
+  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  printf("[%lf s] (%d) FIND FILES: C-files = %d, H-files = %d, O-files = %d, Executable = %d\n", 
+      timeTaken, stepCounter, cFiles.length, hFiles.length, oFiles.length, foundExecutable);
   stepCounter++;
 }
 

@@ -5,6 +5,8 @@
 */
 
 /*> Includes *********************************************************************************************************/
+#include <time.h>
+
 #include "file_list.h"
 #include "globals.h"
 
@@ -48,8 +50,13 @@ static void calc_dependencies_for_list(File_List_Struct* fileList_p)
 
 void calc_dependencies() 
 {
+  clock_t start = clock();
+
   calc_dependencies_for_list(&cFiles);
   calc_dependencies_for_list(&hFiles);
-  printf("(%d) STEP CALCULATE DEPENDENCIES\n", stepCounter);
+
+  clock_t end = clock();
+  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  printf("[%lf s] (%d) CALCULATE DEPENDENCIES\n", timeTaken, stepCounter);
   stepCounter++;
 }

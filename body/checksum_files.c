@@ -7,6 +7,7 @@
 /*> Includes *********************************************************************************************************/
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #include "char_util.h"
 #include "file_list.h"
@@ -338,6 +339,7 @@ static void parse_and_add_include(File_List_Node_Struct* file_node, Line_Buffer_
 /*> Global Function Definitions **************************************************************************************/
 void checksum_and_find_includes()
 {
+  clock_t start = clock();
   for (File_List_Node_Struct* fileNode_p = cFiles.first; fileNode_p != NULL; fileNode_p = fileNode_p->next)
   {
     checksum_and_find_includes_for_file(fileNode_p);
@@ -348,6 +350,8 @@ void checksum_and_find_includes()
     checksum_and_find_includes_for_file(fileNode_p);
   }
 
-  printf("(%d) STEP CHECKSUM AND FIND INCLUDES\n", stepCounter);
+  clock_t end = clock();
+  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  printf("[%lf s] (%d) CHECKSUM AND FIND INCLUDES\n", timeTaken, stepCounter);
   stepCounter++;
 }

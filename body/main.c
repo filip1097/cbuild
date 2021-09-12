@@ -7,6 +7,7 @@
 /*> Includes *********************************************************************************************************/
 #include <stdbool.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "calc_compile.h"
 #include "calc_dependencies.h"
@@ -40,6 +41,7 @@
 /*> Local Function Definitions ***************************************************************************************/
 int main()
 {
+  clock_t start = clock();
   find_files(CURRENT_DIR_PATH); 
   checksum_and_find_includes();
   calc_dependencies();
@@ -60,6 +62,9 @@ int main()
   {
     write_cache(CACHE_PATH);
   }
+  clock_t end = clock();
+  double totalTime = ((double) (end - start)) / CLOCKS_PER_SEC;
+  printf("Total time = %lf s\n", totalTime);
 
   return 0;
 }
