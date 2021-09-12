@@ -1,5 +1,2 @@
 # build folder
 build/*
-
-# cbuild cache
-.cBuildCache
