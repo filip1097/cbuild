@@ -6,6 +6,7 @@
 
 /*> Includes ************************************************************************************************/
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -85,7 +86,7 @@ static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char*
 }
 
 /*> Global Function Definitions *****************************************************************************/
-void compile_object_files()
+bool compile_object_files()
 {
   // TODO: ensure no buffer overflow
   char buildFolderPath[MAX_PATH_LENGTH];
@@ -106,39 +107,33 @@ void compile_object_files()
     determine_dir_paths_to_include(node_p, &numDirsToBeIncluded, dirPathsToBeIncluded);
 
     // TODO: ensure no buffer overflow
-    char command[MAX_COMMAND_LENGTH] = "gcc -c ";
-    if (numDirsToBeIncluded == 0)
+    char command[MAX_COMMAND_LENGTH];
+    sprintf(command, "gcc -c -Werror %s -o ", node_p->path);
+    strcat_object_file_path(command, buildFolderPath, node_p->fileName_p);
+    if (numDirsToBeIncluded > 0)
     {
-      strcat(command, node_p->path);
-      strcat(command, " -o ");
-      strcat_object_file_path(command, buildFolderPath, node_p->fileName_p);
-      printf("DO COMMAND: %s\n", command);
-      system(command);
-    } 
-    else 
-    {
-      strcat(command, node_p->path);
-      strcat(command, " -o ");
-      strcat_object_file_path(command, buildFolderPath, node_p->fileName_p);
       strcat(command, " -I ");
       for (int i = 0; i < numDirsToBeIncluded; i++)
       {
         strncat(command, dirPathsToBeIncluded[i].path_p, dirPathsToBeIncluded[i].length);
         strcat(command, " ");
       }
-      printf("DO COMMAND: %s\n", command);
-      int responseCode = system(command);
-      node_p->failedCompilation = (responseCode != 0);
-      if (node_p->failedCompilation)
-      {
-        numFilesFailingCompilation++; 
-      }
+    }
+
+    printf("DO COMMAND: %s\n", command);
+    int responseCode = system(command);
+    node_p->failedCompilation = (responseCode != 0);
+    if (node_p->failedCompilation)
+    {
+      numFilesFailingCompilation++; 
     }
   }
 
   printf("(%d) STEP COMPILE OBJECT FILES: %d files failed compilation\n", 
       stepCounter, numFilesFailingCompilation);
   stepCounter++;
+
+  return (numFilesFailingCompilation == 0);
 }
 
 void call_linker()

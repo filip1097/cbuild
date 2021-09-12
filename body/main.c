@@ -46,12 +46,13 @@ int main()
 
   bool foundStoredCache = load_stored_cache(CACHE_PATH);
   int numFilesToCompile = determine_files_to_compile(foundStoredCache);
-  
+  bool successfulCompilation = true;
+
   if (numFilesToCompile > 0)
   {
-    compile_object_files();
+    successfulCompilation = compile_object_files();
   }
-  if (numFilesToCompile > 0 || !foundExecutable)
+  if ((numFilesToCompile > 0 && successfulCompilation) || !foundExecutable)
   {
     call_linker();
   }
