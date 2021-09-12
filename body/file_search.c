@@ -95,6 +95,9 @@ static void get_path_of_executable(char* dest_p, int bufferSize)
   get_name_of_cwd(cwdName, bufferSize);
   // TODO: check no buffer overflow
   sprintf(dest_p, "build%s", cwdName);
+#if defined _WIN32
+  strcat(dest_p, ".exe");
+#endif
 }
 
 /*> Global Function Definitions **************************************************************************************/
