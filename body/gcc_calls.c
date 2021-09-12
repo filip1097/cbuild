@@ -147,8 +147,8 @@ void call_linker()
   char buildFolderPath[MAX_PATH_LENGTH];
   sprintf(buildFolderPath, ".%cbuild", PATH_SEPERATOR);
 
-  char linkCommand[MAX_COMMAND_LENGTH] = "gcc ";
-  strcat(linkCommand, "-o ./build/cbuild ");
+  char linkCommand[MAX_COMMAND_LENGTH]; 
+  sprintf(linkCommand, "gcc -o %s ", executablePath);
   for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next) 
   {
     strcat_object_file_path(linkCommand, buildFolderPath, node_p->fileName_p);

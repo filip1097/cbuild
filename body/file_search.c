@@ -7,8 +7,10 @@
 /*> Includes *********************************************************************************************************/
 #include <dirent.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include "file_list.h"
 #include "file_search.h"
@@ -29,6 +31,8 @@
 
 /*> Local Function Declarations **************************************************************************************/
 static void search_for_files(char* currentPath_p);
+static void get_name_of_cwd(char* dest_p, int bufferSize);
+static void get_path_of_executable(char* dest_p, int bufferSize);
 
 /*> Local Function Definitions ***************************************************************************************/
 static void search_for_files(char* currentPath_p)
@@ -73,11 +77,32 @@ static void search_for_files(char* currentPath_p)
   }
 }
 
+static void get_name_of_cwd(char* dest_p, int bufferSize)
+{
+  char* absolutePathNameOfCwd_p = getcwd(dest_p, bufferSize);
+  if (absolutePathNameOfCwd_p == NULL)
+  {
+    perror("getcwd returned NULL: "); 
+    exit(1);
+  }
+  char* lastPathSeperator_p = strrchr(dest_p, PATH_SEPERATOR);
+  strcpy(dest_p, lastPathSeperator_p);
+}
+
+static void get_path_of_executable(char* dest_p, int bufferSize)
+{
+  char cwdName[bufferSize];
+  get_name_of_cwd(cwdName, bufferSize);
+  // TODO: check no buffer overflow
+  sprintf(dest_p, "build%s", cwdName);
+}
+
 /*> Global Function Definitions **************************************************************************************/
 void find_files(char* projectPath_p)
 {
   search_for_files(projectPath_p);
-  foundExecutable = entry_exists("build/cbuild");
+  get_path_of_executable(executablePath, MAX_EXE_PATH_LENGTH);
+  foundExecutable = entry_exists(executablePath);
   printf("(%d) STEP FIND FILES: C-files = %d, H-files = %d, O-files = %d, Executable = %d\n", 
       stepCounter, cFiles.length, hFiles.length, oFiles.length, foundExecutable);
   stepCounter++;
