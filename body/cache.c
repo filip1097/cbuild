@@ -9,12 +9,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "char_util.h"
 #include "int_util.h"
 #include "json_util.h"
 #include "path_util.h"
+#include "time_util.h"
 
 /*> Defines **********************************************************************************************************/
 #define CHECKSUM_STRING_LENGTH 20
@@ -77,7 +78,9 @@ static void convert_checksum_to_string(uint64_t checksum, char checksumString[CH
 /*> Global Function Definitions **************************************************************************************/
 bool load_stored_cache(char* pathToCache_p)
 {
-  clock_t start = clock();
+  struct timeval start, end; 
+  gettimeofday(&start, 0);
+
   bool foundCache = false;
   if (entry_exists(pathToCache_p))
   {
@@ -110,8 +113,9 @@ bool load_stored_cache(char* pathToCache_p)
     free_json(jsonCache_p);
     foundCache = true;
   }
-  clock_t end = clock();
-  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+  gettimeofday(&end, 0);
+  double timeTaken = timeval_diff(&end, &start);
   printf("[%lf s] (%d) FIND AND LOAD STORED CACHE: ", timeTaken, stepCounter);
   if (foundCache)
   {
@@ -127,7 +131,9 @@ bool load_stored_cache(char* pathToCache_p)
 
 void write_cache(char* path_p)
 {
-  clock_t start = clock();
+  struct timeval start, end; 
+  gettimeofday(&start, 0);
+
   JSON_Struct* jsonList_p = new_json_struct(JSON_TYPE_ARRAY, "");
 
   for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next) {
@@ -144,8 +150,8 @@ void write_cache(char* path_p)
 
   free_json(jsonList_p);
 
-  clock_t end = clock();
-  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  gettimeofday(&end, 0);
+  double timeTaken = timeval_diff(&end, &start);
   printf("[%lf s] (%d) WRITE TO CACHE\n", timeTaken, stepCounter);
   stepCounter++;
 }

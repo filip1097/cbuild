@@ -10,13 +10,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <time.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 #include "file_list.h"
 #include "file_search.h"
 #include "globals.h"
 #include "path_util.h"
+#include "time_util.h"
 
 /*> Defines **********************************************************************************************************/
 
@@ -104,14 +105,15 @@ static void get_path_of_executable(char* dest_p, int bufferSize)
 /*> Global Function Definitions **************************************************************************************/
 void find_files(char* projectPath_p)
 {
-  clock_t start = clock();
+  struct timeval start, end; 
+  gettimeofday(&start, 0);
 
   search_for_files(projectPath_p);
   get_path_of_executable(executablePath, MAX_EXE_PATH_LENGTH);
   foundExecutable = entry_exists(executablePath);
 
-  clock_t end = clock();
-  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  gettimeofday(&end, 0);
+  double timeTaken = timeval_diff(&end, &start);
   printf("[%lf s] (%d) FIND FILES: C-files = %d, H-files = %d, O-files = %d, Executable = %d\n", 
       timeTaken, stepCounter, cFiles.length, hFiles.length, oFiles.length, foundExecutable);
   stepCounter++;

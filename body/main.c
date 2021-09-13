@@ -7,8 +7,9 @@
 /*> Includes *********************************************************************************************************/
 #include <stdbool.h>
 #include <stdio.h>
-#include <time.h>
+#include <sys/time.h>
 
+#include "cache.h"
 #include "calc_compile.h"
 #include "calc_dependencies.h"
 #include "checksum_files.h"
@@ -16,7 +17,7 @@
 #include "file_search.h"
 #include "gcc_calls.h"
 #include "globals.h"
-#include "cache.h"
+#include "time_util.h"
 
 /*> Defines **********************************************************************************************************/
 #define CURRENT_DIR_PATH "."
@@ -41,7 +42,9 @@
 /*> Local Function Definitions ***************************************************************************************/
 int main()
 {
-  clock_t start = clock();
+  struct timeval start, end; 
+  gettimeofday(&start, 0);
+
   find_files(CURRENT_DIR_PATH); 
   checksum_and_find_includes();
   calc_dependencies();
@@ -62,8 +65,9 @@ int main()
   {
     write_cache(CACHE_PATH);
   }
-  clock_t end = clock();
-  double totalTime = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+  gettimeofday(&end, 0);
+  double totalTime = timeval_diff(&end, &start);
   printf("Total time = %lf s\n", totalTime);
 
   return 0;

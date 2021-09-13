@@ -5,10 +5,11 @@
 */
 
 /*> Includes *********************************************************************************************************/
-#include <time.h>
+#include <sys/time.h>
 
 #include "file_list.h"
 #include "globals.h"
+#include "time_util.h"
 
 /*> Defines **********************************************************************************************************/
 
@@ -50,13 +51,14 @@ static void calc_dependencies_for_list(File_List_Struct* fileList_p)
 
 void calc_dependencies() 
 {
-  clock_t start = clock();
+  struct timeval start, end; 
+  gettimeofday(&start, 0);
 
   calc_dependencies_for_list(&cFiles);
   calc_dependencies_for_list(&hFiles);
 
-  clock_t end = clock();
-  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  gettimeofday(&end, 0);
+  double timeTaken = timeval_diff(&end, &start);
   printf("[%lf s] (%d) CALCULATE DEPENDENCIES\n", timeTaken, stepCounter);
   stepCounter++;
 }

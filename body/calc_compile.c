@@ -6,10 +6,11 @@
 
 /*> Includes *********************************************************************************************************/
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "file_list.h"
 #include "globals.h"
+#include "time_util.h"
 
 /*> Defines **********************************************************************************************************/
 
@@ -80,7 +81,9 @@ static void determine_o_files_still_exist(File_List_Struct* fileList_p)
 /*> Global Function Definitions **************************************************************************************/
 int determine_files_to_compile(bool foundCache)
 {
-  clock_t start = clock();
+  struct timeval start, end; 
+  gettimeofday(&start, 0);
+
   if (foundCache)
   {
     determine_files_that_have_changed(&cFiles);
@@ -110,8 +113,8 @@ int determine_files_to_compile(bool foundCache)
 
   int numFilesToBeCompiled = calc_num_files_to_compile(&cFiles);
 
-  clock_t end = clock();
-  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  gettimeofday(&end, 0);
+  double timeTaken = timeval_diff(&end, &start);
   printf("[%lf s] (%d) DETERMINE FILES TO BE COMPILED: %d files to be compiled\n", 
       timeTaken, stepCounter, numFilesToBeCompiled);
   stepCounter++;

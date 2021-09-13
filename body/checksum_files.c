@@ -7,7 +7,7 @@
 /*> Includes *********************************************************************************************************/
 #include <stdbool.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "char_util.h"
 #include "file_list.h"
@@ -15,6 +15,7 @@
 #include "int_util.h"
 #include "json_util.h"
 #include "path_util.h"
+#include "time_util.h"
 
 /*> Defines **********************************************************************************************************/
 #define CHAR_BIT_LENGTH 8
@@ -339,7 +340,9 @@ static void parse_and_add_include(File_List_Node_Struct* file_node, Line_Buffer_
 /*> Global Function Definitions **************************************************************************************/
 void checksum_and_find_includes()
 {
-  clock_t start = clock();
+  struct timeval start, end; 
+  gettimeofday(&start, 0);
+
   for (File_List_Node_Struct* fileNode_p = cFiles.first; fileNode_p != NULL; fileNode_p = fileNode_p->next)
   {
     checksum_and_find_includes_for_file(fileNode_p);
@@ -350,8 +353,8 @@ void checksum_and_find_includes()
     checksum_and_find_includes_for_file(fileNode_p);
   }
 
-  clock_t end = clock();
-  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  gettimeofday(&end, 0);
+  double timeTaken = timeval_diff(&end, &start);
   printf("[%lf s] (%d) CHECKSUM AND FIND INCLUDES\n", timeTaken, stepCounter);
   stepCounter++;
 }

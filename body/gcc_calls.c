@@ -10,11 +10,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "file_list.h"
 #include "globals.h"
 #include "path_util.h"
+#include "time_util.h"
 
 /*> Defines *************************************************************************************************/
 
@@ -89,7 +90,8 @@ static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char*
 /*> Global Function Definitions *****************************************************************************/
 bool compile_object_files()
 {
-  clock_t start = clock();
+  struct timeval start, end; 
+  gettimeofday(&start, 0);
 
   // TODO: ensure no buffer overflow
   char buildFolderPath[MAX_PATH_LENGTH];
@@ -132,8 +134,8 @@ bool compile_object_files()
     }
   }
 
-  clock_t end = clock();
-  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  gettimeofday(&end, 0);
+  double timeTaken = timeval_diff(&end, &start);
   printf("[%lf s] (%d) COMPILE OBJECT FILES: %d files failed compilation\n", 
       timeTaken, stepCounter, numFilesFailingCompilation);
   stepCounter++;
@@ -143,7 +145,8 @@ bool compile_object_files()
 
 void call_linker()
 {
-  clock_t start = clock();
+  struct timeval start, end; 
+  gettimeofday(&start, 0);
 
   // TODO: ensure no buffer overflow
   char buildFolderPath[MAX_PATH_LENGTH];
@@ -158,8 +161,8 @@ void call_linker()
   printf("DO COMMAND: %s\n", linkCommand);
   system(linkCommand);
 
-  clock_t end = clock();
-  double timeTaken = ((double) (end - start)) / CLOCKS_PER_SEC;
+  gettimeofday(&end, 0);
+  double timeTaken = timeval_diff(&end, &start);
   printf("[%lf s] (%d) CALL LINKER\n", timeTaken, stepCounter);
   stepCounter++;
 }
