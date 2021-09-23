@@ -22,7 +22,7 @@
 /*> Function Declarations ********************************************************************************************/
 static inline double timeval_diff(struct timeval* t1_p, struct timeval* t2_p)
 {
-  return (t1_p->tv_sec - t2_p->tv_sec) + 10e-6 * (t1_p->tv_usec - t2_p->tv_usec);
+  return (t1_p->tv_sec - t2_p->tv_sec) + 1e-6 * (t1_p->tv_usec - t2_p->tv_usec);
 }
 
 /*> End of Multiple Inclusion Protection *****************************************************************************/
