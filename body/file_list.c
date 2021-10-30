@@ -41,6 +41,7 @@ void add_to_file_list(File_List_Struct* list_p, char* path_p)
 {
   File_List_Node_Struct* newNode_p = malloc(sizeof(*newNode_p));
   newNode_p->numDependencies = 0;
+  newNode_p->numExtraArgs = 0;
   newNode_p->next = NULL;
   newNode_p->toBeCompiled = true;
   newNode_p->failedCompilation = false;
@@ -102,6 +103,14 @@ void add_dependencies_to_file_node(File_List_Node_Struct* dest_node, File_List_N
       add_dependency_to_file_node(dest_node, src_node->dependencies[i]);
     }
   }
+}
+
+void add_extra_arg_to_file_node(File_List_Node_Struct* destNode_p, char* extraArgString_p)
+{
+  assert(strlen(extraArgString_p) < MAX_ARG_LENGTH);
+  strcpy(destNode_p->extraArgs[destNode_p->numExtraArgs], extraArgString_p);
+  (destNode_p->numExtraArgs)++;
+  assert(destNode_p->numExtraArgs <= MAX_NUM_ARGS);
 }
 
 void print_file_list(File_List_Struct* fileList_p)

@@ -17,6 +17,8 @@
 /*> Defines **********************************************************************************************************/
 #define MAX_PATH_LENGTH 250
 #define MAX_DEPENDENCIES 100
+#define MAX_NUM_ARGS 20
+#define MAX_ARG_LENGTH 50
 
 /*> Type Declarations ************************************************************************************************/
 
@@ -27,13 +29,17 @@ typedef struct File_List_Node_Struct
   uint64_t checksum;
   struct File_List_Node_Struct* dependencies[MAX_DEPENDENCIES];
   int numDependencies;
-  struct File_List_Node_Struct* next;
+
+  int numExtraArgs;
+  char extraArgs[MAX_NUM_ARGS][MAX_ARG_LENGTH];
 
   union {
     bool toBeCompiled;
     bool hasChanged;
   };
   bool failedCompilation;
+
+  struct File_List_Node_Struct* next;
 } File_List_Node_Struct;
 
 typedef struct File_List_Struct 
@@ -61,6 +67,8 @@ void static inline add_dependency_to_file_node(File_List_Node_Struct* node, File
 }
 
 void add_dependencies_to_file_node(File_List_Node_Struct* dest_node, File_List_Node_Struct* src_node);
+
+void add_extra_arg_to_file_node(File_List_Node_Struct* destNode_p, char* extraArgString_p);
 
 void print_file_list(File_List_Struct* fileList_p);
 

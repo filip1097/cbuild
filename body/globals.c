@@ -22,6 +22,8 @@ File_List_Struct cachedFiles = { .first = NULL, .last = NULL, .length = 0 };
 char executablePath[MAX_EXE_PATH_LENGTH];
 bool foundExecutable = false;
 int stepCounter = 1;
+int argumentCount = 0;
+char** arguments_pp = NULL;
 
 /*> Local Constant Definitions ***************************************************************************************/
 

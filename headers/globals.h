@@ -28,6 +28,8 @@ extern File_List_Struct cachedFiles;
 extern char executablePath[MAX_EXE_PATH_LENGTH];
 extern bool foundExecutable;
 extern int stepCounter;
+extern int argumentCount;
+extern char** arguments_pp;
 
 /*> Function Declarations ********************************************************************************************/
 

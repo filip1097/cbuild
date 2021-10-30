@@ -40,10 +40,13 @@
 /*> Local Function Declarations **************************************************************************************/
 
 /*> Local Function Definitions ***************************************************************************************/
-int main()
+int main(int argc, char* argv[])
 {
   struct timeval start, end; 
   gettimeofday(&start, 0);
+
+  argumentCount = argc;
+  arguments_pp = argv;
 
   find_files(CURRENT_DIR_PATH); 
   checksum_and_find_includes();

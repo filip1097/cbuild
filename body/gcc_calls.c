@@ -39,6 +39,7 @@ static void determine_dir_paths_to_include(File_List_Node_Struct* fileNode_p,
                                            Path_Part_Struct* dirPathsToInclude_p);
 static void mkdir_if_not_exists(char* dirPath_p);
 static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char* fileName_p);
+static void strcat_arguments(char* dest_p);
 
 /*> Local Function Definitions ******************************************************************************/
 static void determine_dir_paths_to_include(File_List_Node_Struct* fileNode_p,
@@ -87,6 +88,14 @@ static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char*
   strcat(dest_p, ".o ");
 }
 
+static void strcat_arguments(char* dest_p)
+{
+  for (int i = 1; i < argumentCount; i++)
+  {
+    sprintf(dest_p, "%s%s ", dest_p, arguments_pp[i]);
+  }
+}
+
 /*> Global Function Definitions *****************************************************************************/
 bool compile_object_files()
 {
@@ -112,8 +121,10 @@ bool compile_object_files()
     determine_dir_paths_to_include(node_p, &numDirsToBeIncluded, dirPathsToBeIncluded);
 
     // TODO: ensure no buffer overflow
-    char command[MAX_COMMAND_LENGTH];
-    sprintf(command, "gcc -c -Werror %s -o ", node_p->path);
+    char command[MAX_COMMAND_LENGTH] = "gcc -c -Werror ";
+    strcat_arguments(command);
+    strcat(command, node_p->path);
+    strcat(command, " -o ");
     strcat_object_file_path(command, buildFolderPath, node_p->fileName_p);
     if (numDirsToBeIncluded > 0)
     {

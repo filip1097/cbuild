@@ -14,8 +14,10 @@
 #include "json_util.h"
 
 /*> Defines **********************************************************************************************************/
-#define PARSING_ERROR() {\
-  printf("JSON parsing error\n");\
+#define PARSING_ERROR(...) {\
+  printf("JSON parsing error:\n");\
+  printf(__VA_ARGS__);\
+  printf("\n");\
   exit(1);\
 }
 #define EMPTY_STRING "\0"
@@ -117,7 +119,7 @@ static void handle_parsing_stage_start(JSON_Parser_Struct* parser_p, char nextCh
   }
   else
   {
-    PARSING_ERROR();
+    PARSING_ERROR("expected '{' or '[' got '%c'", nextChar);
   }
 }
 
@@ -142,9 +144,13 @@ static void handle_parsing_stage_expecting_new_element_in_array(JSON_Parser_Stru
     parser_p->parsingStage = PARSING_STAGE_EXPECTING_NEW_ELEMENT_IN_ARRAY;
     create_json_struct(parser_p, JSON_TYPE_ARRAY, EMPTY_STRING);
   }
+  else if (nextChar == ']')
+  {
+    close_json_object_or_array(parser_p);
+  }
   else
   {
-    PARSING_ERROR();
+    PARSING_ERROR("expected '\"', '{', '[' or ']' got '%c'", nextChar);
   }
 }
 
@@ -155,9 +161,13 @@ static void handle_parsing_stage_expecting_new_element_in_object(JSON_Parser_Str
     parser_p->parsingStage = PARSING_STAGE_EXPECTING_COLON;
     fill_string(parser_p, parser_p->tempName);
   }
+  else if (nextChar == '}')
+  {
+    close_json_object_or_array(parser_p);
+  }
   else
   {
-    PARSING_ERROR();
+    PARSING_ERROR("expected '\"' or '}' got '%c'", nextChar);
   }
 }
 
@@ -169,7 +179,7 @@ static void handle_parsing_stage_expecting_colon(JSON_Parser_Struct* parser_p, c
   }
   else
   {
-    PARSING_ERROR();
+    PARSING_ERROR("expected ':' got '%c'", nextChar);
   }
 }
 
@@ -187,18 +197,16 @@ static void handle_parsing_stage_expecting_value(JSON_Parser_Struct* parser_p, c
   else if (nextChar == '{')
   {
     parser_p->parsingStage = PARSING_STAGE_EXPECTING_NEW_ELEMENT_IN_OBJECT;
-    fill_string(parser_p, string);
     create_json_struct(parser_p, JSON_TYPE_OBJECT, parser_p->tempName);
   }
   else if (nextChar == '[')
   {
     parser_p->parsingStage = PARSING_STAGE_EXPECTING_NEW_ELEMENT_IN_ARRAY;
-    fill_string(parser_p, string);
     create_json_struct(parser_p, JSON_TYPE_ARRAY, parser_p->tempName);
   }
   else
   {
-    PARSING_ERROR();
+    PARSING_ERROR("expected '\"', '{' or '[' got '%c'", nextChar);
   }
 }
 
@@ -214,7 +222,7 @@ static void handle_parsing_stage_expecting_comma_or_object_close(JSON_Parser_Str
   } 
   else
   {
-    PARSING_ERROR();
+    PARSING_ERROR("expected ',', or '}' got '%c'", nextChar);
   }
 }
 
@@ -229,7 +237,7 @@ static void handle_parsing_stage_expecting_comma_or_array_close(JSON_Parser_Stru
     close_json_object_or_array(parser_p);
     break;
   default:
-    PARSING_ERROR(); 
+    PARSING_ERROR("expected ',', or ']' got '%c'", nextChar);
   }
 }
 
@@ -304,7 +312,7 @@ static void close_json_object_or_array(JSON_Parser_Struct* parser_p)
       parser_p->parsingStage = PARSING_STAGE_EXPECTING_COMMA_OR_ARRAY_CLOSE;
       break;
     default:
-      PARSING_ERROR();
+      PARSING_ERROR("Failed JSON Type");
     }
   }
 }

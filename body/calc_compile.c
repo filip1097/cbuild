@@ -27,6 +27,7 @@
 /*> Local Function Declarations **************************************************************************************/
 static int calc_num_files_to_compile(File_List_Struct* fileList_p);
 static void determine_files_that_have_changed(File_List_Struct* fileList_p);
+static void determine_files_that_used_different_args(File_List_Struct* fileList_p);
 static void determine_o_files_still_exist(File_List_Struct* fileList_p);
 
 /*> Local Function Definitions ***************************************************************************************/
@@ -54,6 +55,48 @@ static void determine_files_that_have_changed(File_List_Struct* fileList_p)
     if (cachedNode_p != NULL)
     {
       node_p->hasChanged = !(node_p->checksum == cachedNode_p->checksum);
+    }
+  }
+}
+
+static void determine_files_that_used_different_args(File_List_Struct* fileList_p)
+{
+  for (File_List_Node_Struct* node_p = fileList_p->first; node_p != NULL; node_p = node_p->next)
+  {
+    if (!node_p->toBeCompiled)
+    {
+      char* nodeName_p = node_p->fileName_p;
+      int nameLength = strlen(nodeName_p);
+
+      File_List_Node_Struct* cachedNode_p = find_file_node(&cachedFiles, nodeName_p, nameLength);
+
+      if (cachedNode_p != NULL)
+      {
+        printf("%s, argc=%d, numExtraArgs=%d\n", nodeName_p, argumentCount, cachedNode_p->numExtraArgs);
+        if (cachedNode_p->numExtraArgs != (argumentCount - 1))
+        {
+          node_p->toBeCompiled = true;
+        }
+        else
+        {
+          for (int i = 1; i < argumentCount; i++)
+          {
+            bool hasEquivalent = false;
+            for (int j = 0; j < cachedNode_p->numExtraArgs; j++)
+            {
+              if (strcmp(arguments_pp[i], cachedNode_p->extraArgs[j]) == 0)
+              {
+                hasEquivalent = true;
+                break;
+              }
+            }
+            if (!hasEquivalent)
+            {
+              node_p->toBeCompiled = true;
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -87,6 +130,7 @@ int determine_files_to_compile(bool foundCache)
   if (foundCache)
   {
     determine_files_that_have_changed(&cFiles);
+    determine_files_that_used_different_args(&cFiles);
     determine_files_that_have_changed(&hFiles);
     determine_o_files_still_exist(&cFiles);
   
