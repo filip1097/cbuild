@@ -72,7 +72,6 @@ static void determine_files_that_used_different_args(File_List_Struct* fileList_
 
       if (cachedNode_p != NULL)
       {
-        printf("%s, argc=%d, numExtraArgs=%d\n", nodeName_p, argumentCount, cachedNode_p->numExtraArgs);
         if (cachedNode_p->numExtraArgs != (argumentCount - 1))
         {
           node_p->toBeCompiled = true;
