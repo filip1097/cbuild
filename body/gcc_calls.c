@@ -90,9 +90,9 @@ static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char*
 
 static void strcat_arguments(char* dest_p)
 {
-  for (int i = 1; i < argumentCount; i++)
+  for (int i = 0; i < compilerArgumentCount; i++)
   {
-    sprintf(dest_p, "%s%s ", dest_p, arguments_pp[i]);
+    sprintf(dest_p, "%s%s ", dest_p, compilerArguments_pp[i]);
   }
 }
 
@@ -104,7 +104,15 @@ bool compile_object_files()
 
   // TODO: ensure no buffer overflow
   char buildFolderPath[MAX_PATH_LENGTH];
-  sprintf(buildFolderPath, ".%cbuild", PATH_SEPERATOR);
+  switch (buildMode)
+  {
+  case BUILD_PRODUCT:
+    sprintf(buildFolderPath, ".%cbuild", PATH_SEPERATOR);
+    break;
+  case BUILD_TEST:
+    sprintf(buildFolderPath, ".%ctest_build", PATH_SEPERATOR);
+    break;
+  }
   mkdir_if_not_exists(buildFolderPath);
 
   int numFilesFailingCompilation = 0;
@@ -161,7 +169,15 @@ void call_linker()
 
   // TODO: ensure no buffer overflow
   char buildFolderPath[MAX_PATH_LENGTH];
-  sprintf(buildFolderPath, ".%cbuild", PATH_SEPERATOR);
+  switch (buildMode)
+  {
+  case BUILD_PRODUCT:
+    sprintf(buildFolderPath, ".%cbuild", PATH_SEPERATOR);
+    break;
+  case BUILD_TEST:
+    sprintf(buildFolderPath, ".%ctest_build", PATH_SEPERATOR);
+    break;
+  }
 
   char linkCommand[MAX_COMMAND_LENGTH]; 
   sprintf(linkCommand, "gcc -o %s ", executablePath);

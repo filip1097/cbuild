@@ -33,6 +33,8 @@
 
 /*> Local Function Declarations **************************************************************************************/
 static void search_for_files(char* currentPath_p);
+static bool should_add_c_file(struct dirent* dirEntry_p);
+static bool should_search_for_files_in_directory(struct dirent* dirEntry_p);
 static void get_name_of_cwd(char* dest_p, int bufferSize);
 static void get_path_of_executable(char* dest_p, int bufferSize);
 
@@ -50,9 +52,12 @@ static void search_for_files(char* currentPath_p)
       struct stat dirEntryStatus;
       stat(dirEntryPath, &dirEntryStatus);
 
-      if (S_ISDIR(dirEntryStatus.st_mode) && dirEntry_p->d_name[0] != '.')
+      if (S_ISDIR(dirEntryStatus.st_mode))
       {
-        search_for_files(dirEntryPath);
+        if (should_search_for_files_in_directory(dirEntry_p))
+        {
+          search_for_files(dirEntryPath);
+        }
       }
       else if (S_ISREG(dirEntryStatus.st_mode))
       {
@@ -61,7 +66,10 @@ static void search_for_files(char* currentPath_p)
         {
           if (strcmp(&firstPeriod_p[1], "c") == 0)
           {
-            add_to_file_list(&cFiles, dirEntryPath);
+            if (should_add_c_file(dirEntry_p))
+            {
+              add_to_file_list(&cFiles, dirEntryPath);
+            }
           }
           else if (strcmp(&firstPeriod_p[1], "h") == 0)
           {
@@ -79,6 +87,39 @@ static void search_for_files(char* currentPath_p)
   }
 }
 
+static bool should_add_c_file(struct dirent* dirEntry_p)
+{
+  char* name_p = dirEntry_p->d_name;
+
+  bool should_add = true;
+  if (buildMode == BUILD_TEST)
+  {
+    should_add = strcmp(name_p, "main.c") != 0;
+  }
+
+  return should_add;
+}
+
+static bool should_search_for_files_in_directory(struct dirent* dirEntry_p)
+{
+  char* name_p = dirEntry_p->d_name;
+
+  bool should_search = name_p[0] != '.';
+  switch (buildMode)
+  {
+  case BUILD_PRODUCT:
+    should_search = should_search &&
+                    strcmp(name_p, "test") != 0 &&
+                    strcmp(name_p, "test_build") != 0;
+    break;
+  case BUILD_TEST:
+    should_search = should_search && strcmp(name_p, "build") != 0;
+    break;
+  }
+
+  return should_search;
+}
+
 static void get_name_of_cwd(char* dest_p, int bufferSize)
 {
   char* absolutePathNameOfCwd_p = getcwd(dest_p, bufferSize);
@@ -94,9 +135,18 @@ static void get_name_of_cwd(char* dest_p, int bufferSize)
 static void get_path_of_executable(char* dest_p, int bufferSize)
 {
   char cwdName[bufferSize];
-  get_name_of_cwd(cwdName, bufferSize);
-  // TODO: check no buffer overflow
-  sprintf(dest_p, "build%s", cwdName);
+  switch (buildMode)
+  {
+  case BUILD_PRODUCT:
+    get_name_of_cwd(cwdName, bufferSize);
+    // TODO: check no buffer overflow
+    sprintf(dest_p, ".\\build%s", cwdName);
+    break;
+  case BUILD_TEST:
+    // TODO: check no buffer overflow
+    sprintf(dest_p, ".\\test_build\\test");
+    break;
+  }
 #if defined _WIN32
   strcat(dest_p, ".exe");
 #endif

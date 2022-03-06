@@ -72,18 +72,18 @@ static void determine_files_that_used_different_args(File_List_Struct* fileList_
 
       if (cachedNode_p != NULL)
       {
-        if (cachedNode_p->numExtraArgs != (argumentCount - 1))
+        if (cachedNode_p->numExtraArgs != compilerArgumentCount)
         {
           node_p->toBeCompiled = true;
         }
         else
         {
-          for (int i = 1; i < argumentCount; i++)
+          for (int i = 0; i < compilerArgumentCount; i++)
           {
             bool hasEquivalent = false;
             for (int j = 0; j < cachedNode_p->numExtraArgs; j++)
             {
-              if (strcmp(arguments_pp[i], cachedNode_p->extraArgs[j]) == 0)
+              if (strcmp(compilerArguments_pp[i], cachedNode_p->extraArgs[j]) == 0)
               {
                 hasEquivalent = true;
                 break;

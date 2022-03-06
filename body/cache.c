@@ -62,10 +62,10 @@ static JSON_Struct* create_file_json_object(File_List_Node_Struct* fileNode_p)
   add_child_to_json(fileObject_p, checksumAttribute_p);
 
   JSON_Struct* extraArgumentList_p = new_json_struct(JSON_TYPE_ARRAY, "extraArgs");
-  for (int i = 1; i < argumentCount; i++)
+  for (int i = 0; i < compilerArgumentCount; i++)
   {
     JSON_Struct* extraArg_p = new_json_struct(JSON_TYPE_STRING, "");
-    add_string_value_to_json(extraArg_p, arguments_pp[i]);
+    add_string_value_to_json(extraArg_p, compilerArguments_pp[i]);
     add_child_to_json(extraArgumentList_p, extraArg_p);
   }
   add_child_to_json(fileObject_p, extraArgumentList_p);

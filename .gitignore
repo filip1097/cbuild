@@ -1,5 +1,6 @@
 # build folder
 build/*
+test_build/*
 
 # vscode folder
 .vscode/*
