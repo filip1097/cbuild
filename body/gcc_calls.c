@@ -1,10 +1,10 @@
-/*> Description *********************************************************************************************/
+/*> Description ***********************************************************************************/
 /**
 * @brief Defines functions to call gcc.
 * @file gcc_calls.c
 */
 
-/*> Includes ************************************************************************************************/
+/*> Includes **************************************************************************************/
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -17,23 +17,23 @@
 #include "path_util.h"
 #include "time_util.h"
 
-/*> Defines *************************************************************************************************/
+/*> Defines ***************************************************************************************/
 
 #define MAX_INCLUDE_PATHS 100
 #define MAX_COMMAND_LENGTH 1000
 #define MAX_PATH_LENGTH 250
 
-/*> Type Declarations ***************************************************************************************/
+/*> Type Declarations *****************************************************************************/
 
-/*> Global Constant Definitions *****************************************************************************/
+/*> Global Constant Definitions *******************************************************************/
 
-/*> Global Variable Definitions *****************************************************************************/
+/*> Global Variable Definitions *******************************************************************/
 
-/*> Local Constant Definitions ******************************************************************************/
+/*> Local Constant Definitions ********************************************************************/
 
-/*> Local Variable Definitions ******************************************************************************/
+/*> Local Variable Definitions ********************************************************************/
 
-/*> Local Function Declarations *****************************************************************************/
+/*> Local Function Declarations *******************************************************************/
 static void determine_dir_paths_to_include(File_List_Node_Struct* fileNode_p,
                                            int* numDirsToInclude_p,
                                            Path_Part_Struct* dirPathsToInclude_p);
@@ -41,7 +41,7 @@ static void mkdir_if_not_exists(char* dirPath_p);
 static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char* fileName_p);
 static void strcat_arguments(char* dest_p);
 
-/*> Local Function Definitions ******************************************************************************/
+/*> Local Function Definitions ********************************************************************/
 static void determine_dir_paths_to_include(File_List_Node_Struct* fileNode_p,
                                            int* numDirsToInclude_p, 
                                            Path_Part_Struct* dirPathsToInclude_p)
@@ -92,11 +92,13 @@ static void strcat_arguments(char* dest_p)
 {
   for (int i = 0; i < compilerArgumentCount; i++)
   {
-    sprintf(dest_p, "%s%s ", dest_p, compilerArguments_pp[i]);
+    int snprintfStatus =
+        snprintf(dest_p, MAX_COMMAND_LENGTH, "%s%s ", dest_p, compilerArguments_pp[i]);
+    assert(snprintfStatus >= 0);
   }
 }
 
-/*> Global Function Definitions *****************************************************************************/
+/*> Global Function Definitions *******************************************************************/
 bool compile_object_files()
 {
   struct timeval start, end; 
@@ -186,11 +188,13 @@ void call_linker()
     strcat_object_file_path(linkCommand, buildFolderPath, node_p->fileName_p);
   }
   printf("DO COMMAND: %s\n", linkCommand);
-  system(linkCommand);
+  int systemResponseCode = system(linkCommand);
+  bool successfulLinking = systemResponseCode == 0;
 
   gettimeofday(&end, 0);
+  char* linkResultString = successfulLinking ? "successful" : "failed";
   double timeTaken = timeval_diff(&end, &start);
-  printf("[%lf s] (%d) CALL LINKER\n", timeTaken, stepCounter);
+  printf("[%lf s] (%d) CALL LINKER: %s\n", timeTaken, stepCounter, linkResultString);
   stepCounter++;
 }
 
