@@ -1,10 +1,10 @@
-/*> Description ******************************************************************************************************/
+/*> Description ***********************************************************************************/
 /**
 * @brief Defines functions for searching files.
 * @file file_search.c
 */
 
-/*> Includes *********************************************************************************************************/
+/*> Includes **************************************************************************************/
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,26 +19,26 @@
 #include "path_util.h"
 #include "time_util.h"
 
-/*> Defines **********************************************************************************************************/
+/*> Defines ***************************************************************************************/
 
-/*> Type Declarations ************************************************************************************************/
+/*> Type Declarations *****************************************************************************/
 
-/*> Global Constant Definitions **************************************************************************************/
+/*> Global Constant Definitions *******************************************************************/
 
-/*> Global Variable Definitions **************************************************************************************/
+/*> Global Variable Definitions *******************************************************************/
 
-/*> Local Constant Definitions ***************************************************************************************/
+/*> Local Constant Definitions ********************************************************************/
 
-/*> Local Variable Definitions ***************************************************************************************/
+/*> Local Variable Definitions ********************************************************************/
 
-/*> Local Function Declarations **************************************************************************************/
+/*> Local Function Declarations *******************************************************************/
 static void search_for_files(char* currentPath_p);
 static bool should_add_c_file(struct dirent* dirEntry_p);
 static bool should_search_for_files_in_directory(struct dirent* dirEntry_p);
 static void get_name_of_cwd(char* dest_p, int bufferSize);
 static void get_path_of_executable(char* dest_p, int bufferSize);
 
-/*> Local Function Definitions ***************************************************************************************/
+/*> Local Function Definitions ********************************************************************/
 static void search_for_files(char* currentPath_p)
 {
   DIR* dir_stream = opendir(currentPath_p);
@@ -140,11 +140,11 @@ static void get_path_of_executable(char* dest_p, int bufferSize)
   case BUILD_PRODUCT:
     get_name_of_cwd(cwdName, bufferSize);
     // TODO: check no buffer overflow
-    sprintf(dest_p, ".\\build%s", cwdName);
+    sprintf(dest_p, ".%cbuild%s", PATH_SEPERATOR, cwdName);
     break;
   case BUILD_TEST:
     // TODO: check no buffer overflow
-    sprintf(dest_p, ".\\test_build\\test");
+    sprintf(dest_p, ".%ctest_build%ctest", PATH_SEPERATOR, PATH_SEPERATOR);
     break;
   }
 #if defined _WIN32
@@ -152,7 +152,7 @@ static void get_path_of_executable(char* dest_p, int bufferSize)
 #endif
 }
 
-/*> Global Function Definitions **************************************************************************************/
+/*> Global Function Definitions *******************************************************************/
 void find_files(char* projectPath_p)
 {
   struct timeval start, end; 
