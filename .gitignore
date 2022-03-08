@@ -4,3 +4,6 @@ test_build/*
 
 # vscode folder
 .vscode/*
+
+# compile flags for clagd
+compile_flags.txt
