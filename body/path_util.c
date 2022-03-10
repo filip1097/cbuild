@@ -59,5 +59,5 @@ Path_Part_Struct get_dir_part(char* path_p)
 {
   char* lastPathSeperator_p = strrchr(path_p, PATH_SEPERATOR);
   Path_Part_Struct dirPath = {.path_p = path_p, .length = lastPathSeperator_p - path_p + 1};
-  return dirPath; 
+  return dirPath;
 }

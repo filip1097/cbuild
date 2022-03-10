@@ -60,7 +60,7 @@ static void determine_dir_paths_to_include(File_List_Node_Struct* fileNode_p,
         break;
       }
     }
-      
+
     if (!foundDirPath)
     {
       assert(*numDirsToInclude_p < MAX_INCLUDE_PATHS);
@@ -141,6 +141,14 @@ bool compile_object_files()
       strcat(command, " -I ");
       for (int i = 0; i < numDirsToBeIncluded; i++)
       {
+        // remove corner case in windows: '.\' cannot be included, but '.' can.
+#if defined _WIN32
+        if (strncmp(dirPathsToBeIncluded[i].path_p, ".\\", dirPathsToBeIncluded[i].length) == 0)
+        {
+          dirPathsToBeIncluded[i].length = 1;
+        }
+#endif
+
         strncat(command, dirPathsToBeIncluded[i].path_p, dirPathsToBeIncluded[i].length);
         strcat(command, " ");
       }
@@ -191,8 +199,9 @@ void call_linker()
   int systemResponseCode = system(linkCommand);
   bool successfulLinking = systemResponseCode == 0;
 
-  gettimeofday(&end, 0);
   char* linkResultString = successfulLinking ? "successful" : "failed";
+
+  gettimeofday(&end, 0);
   double timeTaken = timeval_diff(&end, &start);
   printf("[%lf s] (%d) CALL LINKER: %s\n", timeTaken, stepCounter, linkResultString);
   stepCounter++;
