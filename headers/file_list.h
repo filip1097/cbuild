@@ -14,8 +14,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "path_util.h"
+
 /*> Defines **********************************************************************************************************/
-#define MAX_PATH_LENGTH 250
 #define MAX_DEPENDENCIES 100
 #define MAX_NUM_ARGS 20
 #define MAX_ARG_LENGTH 50

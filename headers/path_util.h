@@ -21,6 +21,8 @@
   #define PATH_SEPERATOR '/'
 #endif
 
+#define MAX_PATH_LENGTH 250
+
 /*> Type Declarations ************************************************************************************************/
 typedef struct Path_Part_Struct
 {

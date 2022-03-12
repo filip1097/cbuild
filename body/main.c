@@ -22,11 +22,6 @@
 
 /*> Defines **********************************************************************************************************/
 #define CURRENT_DIR_PATH "."
-#if defined _WIN32
-  #define CACHE_PATH "build\\.cBuildCache"
-#elif defined __linux__
-  #define CACHE_PATH "build/.cBuildCache"
-#endif
 
 /*> Type Declarations ************************************************************************************************/
 
@@ -52,7 +47,7 @@ int main(int argc, char* argv[])
   checksum_and_find_includes();
   calc_dependencies();
 
-  bool foundStoredCache = load_stored_cache(CACHE_PATH);
+  bool foundStoredCache = load_stored_cache(cachePath);
   int numFilesToCompile = determine_files_to_compile(foundStoredCache);
   bool successfulCompilation = true;
 
@@ -66,7 +61,7 @@ int main(int argc, char* argv[])
   }
   if (numFilesToCompile > 0)
   {
-    write_cache(CACHE_PATH);
+    write_cache(cachePath);
   }
 
   gettimeofday(&end, 0);

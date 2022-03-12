@@ -14,7 +14,6 @@
 #include "file_list.h"
 
 /*> Defines **********************************************************************************************************/
-#define MAX_EXE_PATH_LENGTH 200
 
 /*> Type Declarations ************************************************************************************************/
 /**
@@ -33,7 +32,8 @@ extern File_List_Struct cFiles;
 extern File_List_Struct hFiles;
 extern File_List_Struct oFiles;
 extern File_List_Struct cachedFiles;
-extern char executablePath[MAX_EXE_PATH_LENGTH];
+extern char cachePath[MAX_PATH_LENGTH];
+extern char executablePath[MAX_PATH_LENGTH];
 extern bool foundExecutable;
 extern BuildModeE buildMode;
 extern int stepCounter;

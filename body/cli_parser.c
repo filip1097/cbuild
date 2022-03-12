@@ -9,6 +9,7 @@
 #include <sys/time.h>
 
 #include "globals.h"
+#include "path_util.h"
 #include "time_util.h"
 
 /*> Defines **********************************************************************************************************/
@@ -56,12 +57,14 @@ void parse_arguments(int argumentCount, char** arguments_pp)
       compilerArgumentCount = argumentCount - 2;
       compilerArguments_pp = &arguments_pp[2];
       buildMode = BUILD_TEST;
+      sprintf(cachePath, ".%cbuild%c.cBuildCace", PATH_SEPERATOR, PATH_SEPERATOR);
     }
     else
     {
       compilerArgumentCount = argumentCount - 1;
       compilerArguments_pp = &arguments_pp[1];
       buildMode = BUILD_PRODUCT;
+      sprintf(cachePath, ".%ctest_build%c.cBuildCace", PATH_SEPERATOR, PATH_SEPERATOR);
     }
   }
 

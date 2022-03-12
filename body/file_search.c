@@ -159,7 +159,7 @@ void find_files(char* projectPath_p)
   gettimeofday(&start, 0);
 
   search_for_files(projectPath_p);
-  get_path_of_executable(executablePath, MAX_EXE_PATH_LENGTH);
+  get_path_of_executable(executablePath, MAX_PATH_LENGTH);
   foundExecutable = entry_exists(executablePath);
 
   gettimeofday(&end, 0);
