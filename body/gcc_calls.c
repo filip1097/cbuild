@@ -90,11 +90,13 @@ static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char*
 
 static void strcat_arguments(char* dest_p)
 {
+  int length = strlen(dest_p);
   for (int i = 0; i < compilerArgumentCount; i++)
   {
-    int snprintfStatus =
-        snprintf(dest_p, MAX_COMMAND_LENGTH, "%s%s ", dest_p, compilerArguments_pp[i]);
-    assert(snprintfStatus >= 0);
+    int maxNumberCharsToBeAppended = MAX_COMMAND_LENGTH - length;
+    strncat(dest_p, compilerArguments_pp[i], maxNumberCharsToBeAppended);
+    strncat(dest_p, " ", maxNumberCharsToBeAppended);
+    length += strlen(compilerArguments_pp[i]) + 1;
   }
 }
 
