@@ -50,22 +50,19 @@ void parse_arguments(int argumentCount, char** arguments_pp)
   struct timeval start, end; 
   gettimeofday(&start, 0);
 
-  if (argumentCount > 1)
+  if (argumentCount > 1 && strcmp(arguments_pp[1], "--test") == 0)
   {
-    if (strcmp(arguments_pp[1], "--test") == 0)
-    {
-      compilerArgumentCount = argumentCount - 2;
-      compilerArguments_pp = &arguments_pp[2];
-      buildMode = BUILD_TEST;
-      sprintf(cachePath, ".%cbuild%c.cBuildCace", PATH_SEPERATOR, PATH_SEPERATOR);
-    }
-    else
-    {
-      compilerArgumentCount = argumentCount - 1;
-      compilerArguments_pp = &arguments_pp[1];
-      buildMode = BUILD_PRODUCT;
-      sprintf(cachePath, ".%ctest_build%c.cBuildCace", PATH_SEPERATOR, PATH_SEPERATOR);
-    }
+    compilerArgumentCount = argumentCount - 2;
+    compilerArguments_pp = &arguments_pp[2];
+    buildMode = BUILD_TEST;
+    sprintf(cachePath, ".%ctest_build%c.cBuildCache", PATH_SEPERATOR, PATH_SEPERATOR);
+  }
+  else
+  {
+    compilerArgumentCount = argumentCount - 1;
+    compilerArguments_pp = &arguments_pp[1];
+    buildMode = BUILD_PRODUCT;
+    sprintf(cachePath, ".%cbuild%c.cBuildCache", PATH_SEPERATOR, PATH_SEPERATOR);
   }
 
   gettimeofday(&end, 0);
