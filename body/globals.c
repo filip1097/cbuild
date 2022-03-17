@@ -20,6 +20,7 @@ File_List_Struct hFiles = { .first = NULL, .last = NULL, .length = 0 };
 File_List_Struct oFiles = { .first = NULL, .last = NULL, .length = 0 };
 File_List_Struct cachedFiles = { .first = NULL, .last = NULL, .length = 0 };
 char cachePath[MAX_PATH_LENGTH];
+char buildDirPath[MAX_PATH_LENGTH];
 char executablePath[MAX_PATH_LENGTH];
 bool foundExecutable = false;
 BuildModeE buildMode = BUILD_PRODUCT;

@@ -33,6 +33,7 @@ extern File_List_Struct hFiles;
 extern File_List_Struct oFiles;
 extern File_List_Struct cachedFiles;
 extern char cachePath[MAX_PATH_LENGTH];
+extern char buildDirPath[MAX_PATH_LENGTH];
 extern char executablePath[MAX_PATH_LENGTH];
 extern bool foundExecutable;
 extern BuildModeE buildMode;

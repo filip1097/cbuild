@@ -55,15 +55,16 @@ void parse_arguments(int argumentCount, char** arguments_pp)
     compilerArgumentCount = argumentCount - 2;
     compilerArguments_pp = &arguments_pp[2];
     buildMode = BUILD_TEST;
-    sprintf(cachePath, ".%ctest_build%c.cBuildCache", PATH_SEPERATOR, PATH_SEPERATOR);
+    sprintf(buildDirPath, ".%ctest_build%c", PATH_SEPERATOR, PATH_SEPERATOR);
   }
   else
   {
     compilerArgumentCount = argumentCount - 1;
     compilerArguments_pp = &arguments_pp[1];
     buildMode = BUILD_PRODUCT;
-    sprintf(cachePath, ".%cbuild%c.cBuildCache", PATH_SEPERATOR, PATH_SEPERATOR);
+    sprintf(buildDirPath, ".%cbuild%c", PATH_SEPERATOR, PATH_SEPERATOR);
   }
+  sprintf(cachePath, "%s.cBuildCache", buildDirPath);
 
   gettimeofday(&end, 0);
   double timeTaken = timeval_diff(&end, &start);

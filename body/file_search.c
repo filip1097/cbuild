@@ -129,7 +129,7 @@ static void get_name_of_cwd(char* dest_p, int bufferSize)
     exit(1);
   }
   char* lastPathSeperator_p = strrchr(dest_p, PATH_SEPERATOR);
-  strcpy(dest_p, lastPathSeperator_p);
+  strcpy(dest_p, lastPathSeperator_p + 1);
 }
 
 static void get_path_of_executable(char* dest_p, int bufferSize)
@@ -140,11 +140,11 @@ static void get_path_of_executable(char* dest_p, int bufferSize)
   case BUILD_PRODUCT:
     get_name_of_cwd(cwdName, bufferSize);
     // TODO: check no buffer overflow
-    sprintf(dest_p, ".%cbuild%s", PATH_SEPERATOR, cwdName);
+    sprintf(dest_p, "%s%s", buildDirPath, cwdName);
     break;
   case BUILD_TEST:
     // TODO: check no buffer overflow
-    sprintf(dest_p, ".%ctest_build%ctest", PATH_SEPERATOR, PATH_SEPERATOR);
+    sprintf(dest_p, "%stest", buildDirPath);
     break;
   }
 #if defined _WIN32

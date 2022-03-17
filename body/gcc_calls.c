@@ -83,7 +83,7 @@ static void strcat_object_file_path(char* dest_p, char* buildFolderPath_p, char*
 {
   char* lastPeriodInFileName_p = strrchr(fileName_p, '.');
   int lengthOfFileNameNotIncludingExtension = lastPeriodInFileName_p - fileName_p;
-  sprintf(dest_p, "%s%s%c", dest_p, buildFolderPath_p, PATH_SEPERATOR);
+  sprintf(dest_p, "%s%s", dest_p, buildFolderPath_p);
   strncat(dest_p, fileName_p, lengthOfFileNameNotIncludingExtension);
   strcat(dest_p, ".o ");
 }
@@ -106,18 +106,7 @@ bool compile_object_files()
   struct timeval start, end; 
   gettimeofday(&start, 0);
 
-  // TODO: ensure no buffer overflow
-  char buildFolderPath[MAX_PATH_LENGTH];
-  switch (buildMode)
-  {
-  case BUILD_PRODUCT:
-    sprintf(buildFolderPath, ".%cbuild", PATH_SEPERATOR);
-    break;
-  case BUILD_TEST:
-    sprintf(buildFolderPath, ".%ctest_build", PATH_SEPERATOR);
-    break;
-  }
-  mkdir_if_not_exists(buildFolderPath);
+  mkdir_if_not_exists(buildDirPath);
 
   int numFilesFailingCompilation = 0;
 
@@ -137,7 +126,7 @@ bool compile_object_files()
     strcat_arguments(command);
     strcat(command, node_p->path);
     strcat(command, " -o ");
-    strcat_object_file_path(command, buildFolderPath, node_p->fileName_p);
+    strcat_object_file_path(command, buildDirPath, node_p->fileName_p);
     if (numDirsToBeIncluded > 0)
     {
       strcat(command, " -I ");
@@ -179,23 +168,11 @@ void call_linker()
   struct timeval start, end; 
   gettimeofday(&start, 0);
 
-  // TODO: ensure no buffer overflow
-  char buildFolderPath[MAX_PATH_LENGTH];
-  switch (buildMode)
-  {
-  case BUILD_PRODUCT:
-    sprintf(buildFolderPath, ".%cbuild", PATH_SEPERATOR);
-    break;
-  case BUILD_TEST:
-    sprintf(buildFolderPath, ".%ctest_build", PATH_SEPERATOR);
-    break;
-  }
-
   char linkCommand[MAX_COMMAND_LENGTH]; 
   sprintf(linkCommand, "gcc -o %s ", executablePath);
   for (File_List_Node_Struct* node_p = cFiles.first; node_p != NULL; node_p = node_p->next) 
   {
-    strcat_object_file_path(linkCommand, buildFolderPath, node_p->fileName_p);
+    strcat_object_file_path(linkCommand, buildDirPath, node_p->fileName_p);
   }
   printf("DO COMMAND: %s\n", linkCommand);
   int systemResponseCode = system(linkCommand);
