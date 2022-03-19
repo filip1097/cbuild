@@ -135,18 +135,21 @@ static void get_name_of_cwd(char* dest_p, int bufferSize)
 static void get_path_of_executable(char* dest_p, int bufferSize)
 {
   char cwdName[bufferSize];
+  int numCharsWrittenIntoBuffer;
   switch (buildMode)
   {
   case BUILD_PRODUCT:
     get_name_of_cwd(cwdName, bufferSize);
-    // TODO: check no buffer overflow
-    sprintf(dest_p, "%s%s", buildDirPath, cwdName);
+    numCharsWrittenIntoBuffer = snprintf(dest_p, bufferSize, "%s%s", buildDirPath, cwdName);
     break;
   case BUILD_TEST:
-    // TODO: check no buffer overflow
-    sprintf(dest_p, "%stest", buildDirPath);
+    numCharsWrittenIntoBuffer = snprintf(dest_p, bufferSize, "%stest", buildDirPath);
     break;
   }
+
+  assert(numCharsWrittenIntoBuffer > 0 && 
+         numCharsWrittenIntoBuffer < bufferSize);
+
 #if defined _WIN32
   strcat(dest_p, ".exe");
 #endif

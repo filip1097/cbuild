@@ -1,10 +1,10 @@
-/*> Description ******************************************************************************************************/ 
+/*> Description ***********************************************************************************/ 
 /** 
 * @brief Defines functions to parse CLI arguments.
 * @file cli_parser.c
 */
 
-/*> Includes *********************************************************************************************************/
+/*> Includes **************************************************************************************/
 #include <string.h>
 #include <sys/time.h>
 
@@ -12,25 +12,25 @@
 #include "path_util.h"
 #include "time_util.h"
 
-/*> Defines **********************************************************************************************************/
+/*> Defines ***************************************************************************************/
 #define PRODUCT_STRING "Product"
 #define TEST_STRING "Test"
 #define UNKOWN_STRING "Unknown"
 
-/*> Type Declarations ************************************************************************************************/
+/*> Type Declarations *****************************************************************************/
 
-/*> Global Constant Definitions **************************************************************************************/
+/*> Global Constant Definitions *******************************************************************/
 
-/*> Global Variable Definitions **************************************************************************************/
+/*> Global Variable Definitions *******************************************************************/
 
-/*> Local Constant Definitions ***************************************************************************************/
+/*> Local Constant Definitions ********************************************************************/
 
-/*> Local Variable Definitions ***************************************************************************************/
+/*> Local Variable Definitions ********************************************************************/
 
-/*> Local Function Declarations **************************************************************************************/
+/*> Local Function Declarations *******************************************************************/
 char* get_build_mode_string(BuildModeE buildMode);
 
-/*> Local Function Definitions ***************************************************************************************/
+/*> Local Function Definitions ********************************************************************/
 char* get_build_mode_string(BuildModeE buildMode)
 {
   switch (buildMode)
@@ -44,7 +44,7 @@ char* get_build_mode_string(BuildModeE buildMode)
   }
 }
 
-/*> Global Function Definitions **************************************************************************************/
+/*> Global Function Definitions *******************************************************************/
 void parse_arguments(int argumentCount, char** arguments_pp)
 {
   struct timeval start, end; 
@@ -64,7 +64,8 @@ void parse_arguments(int argumentCount, char** arguments_pp)
     buildMode = BUILD_PRODUCT;
     sprintf(buildDirPath, ".%cbuild%c", PATH_SEPERATOR, PATH_SEPERATOR);
   }
-  sprintf(cachePath, "%s.cBuildCache", buildDirPath);
+  int numCharsWritten = snprintf(cachePath, MAX_PATH_LENGTH, "%s.cBuildCache", buildDirPath);
+  assert(numCharsWritten >= 0 && numCharsWritten < MAX_PATH_LENGTH);
 
   gettimeofday(&end, 0);
   double timeTaken = timeval_diff(&end, &start);

@@ -34,3 +34,4 @@ Things that are on the list to be done in the project:
 
 * Only compile necessary files.
 * Product code files will not be included in `./test_build`.
+* Replace all sprintf with snprintf
